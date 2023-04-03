@@ -20,8 +20,8 @@ async def create_quiz(quiz_in: QuizCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=409, detail=error)
 
 
-@router.put('/', status_code=status.HTTP_200_OK)
-async def update_quiz(quiz_in: QuizUpdate, db: Session = Depends(get_db)):
+@router.put('/{quiz_id}', status_code=status.HTTP_200_OK)
+async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: Session = Depends(get_db)):
     """
     Update quiz by id
     """

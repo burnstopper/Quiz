@@ -23,5 +23,5 @@ class Quiz(QuizBase):
         orm_mode = True
 
 
-class QuizUpdate(Quiz):
+class QuizUpdate(QuizCreate):
     pass

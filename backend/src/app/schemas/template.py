@@ -22,5 +22,5 @@ class Template(TemplateCreate):
         orm_mode = True
 
 
-class TemplateUpdate(Template):
+class TemplateUpdate(TemplateCreate):
     pass

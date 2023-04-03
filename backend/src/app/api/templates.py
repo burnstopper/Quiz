@@ -19,8 +19,8 @@ async def create_template(template_in: TemplateCreate, db: Session = Depends(get
         raise HTTPException(status_code=409, detail=error)
 
 
-@router.put('/', status_code=status.HTTP_200_OK)
-async def update_template(template_in: TemplateUpdate, db: Session = Depends(get_db)):
+@router.put('/{template_id}', status_code=status.HTTP_200_OK)
+async def update_template(template_id: int, template_in: TemplateUpdate, db: Session = Depends(get_db)):
     """
     Update template by id
     """

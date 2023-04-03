@@ -65,10 +65,10 @@ class CRUDTemplate:
                                                         )
         await db.commit()
 
-    async def update_template(self, db: AsyncSession, template_in: RequiredTemplate):
+    async def update_template(self, db: AsyncSession, template_id: int, template_in: RequiredTemplate):
         is_unique: bool = await self.is_unique_template_name(db=db,
                                                              template_name=template_in.name,
-                                                             template_id=template_in.id)
+                                                             template_id=template_id)
 
         # template with this name has been already created
         if not is_unique:
@@ -83,7 +83,7 @@ class CRUDTemplate:
 
         await db.execute(query)
 
-        await crud_template_tests.update_template_tests(db=db, template_id=template_in.id, tests=template_in.tests_ids)
+        await crud_template_tests.update_template_tests(db=db, template_id=template_id, tests=template_in.tests_ids)
 
         await db.commit()
 

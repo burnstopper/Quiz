@@ -49,8 +49,8 @@ class CRUDQuiz:
         db.add(new_quiz)
         await db.commit()
 
-    async def update_quiz(self, db: AsyncSession, quiz_in: QuizUpdate) -> str | None:
-        is_unique: bool = await self.is_quiz_name_unique(db=db, quiz_name=quiz_in.name)
+    async def update_quiz(self, db: AsyncSession, quiz_id: int, quiz_in: QuizUpdate) -> str | None:
+        is_unique: bool = await self.is_quiz_name_unique(db=db, quiz_name=quiz_in.name, quiz_id=quiz_id)
 
         # quiz with this name has been already created
         if not is_unique:
@@ -58,7 +58,7 @@ class CRUDQuiz:
 
         query = (
             update(self.model)
-            .where(self.model.id == quiz_in.id)
+            .where(self.model.id == quiz_id)
             .values(quiz_in.dict(exclude_unset=True))
             .returning(Quiz)
         )
