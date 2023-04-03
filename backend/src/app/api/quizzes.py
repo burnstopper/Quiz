@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondent
@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
-async def create_quiz(quiz_in: QuizCreate, db: Session = Depends(get_db)):
+async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)):
     """
     Create new quiz
     """
@@ -21,18 +21,18 @@ async def create_quiz(quiz_in: QuizCreate, db: Session = Depends(get_db)):
 
 
 @router.put('/{quiz_id}', status_code=status.HTTP_200_OK)
-async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: Session = Depends(get_db)):
+async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depends(get_db)):
     """
     Update quiz by id
     """
 
-    error: str | None = await crud_quizzes.update_quiz(db=db, quiz_in=quiz_in)
+    error: str | None = await crud_quizzes.update_quiz(db=db, quiz_id=quiz_id, quiz_in=quiz_in)
     if error is not None:
         raise HTTPException(status_code=409, detail=error)
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=list[Quiz])
-async def get_quizzes(respondent_id: int = None, db: Session = Depends(get_db)) -> list[Quiz]:
+async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_db)) -> list[Quiz]:
     """
     Get all quizzes or quizzes for the respondent
     """
@@ -46,7 +46,7 @@ async def get_quizzes(respondent_id: int = None, db: Session = Depends(get_db)) 
 
 
 @router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=Quiz)
-async def get_quiz_by_id(quiz_id: int, db: Session = Depends(get_db)) -> Quiz | None:
+async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Quiz | None:
     """
     Get quiz by id
     """

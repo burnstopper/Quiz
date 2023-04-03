@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.template_tests import crud as crud_template_tests
 from app.models.template import Template
 from app.schemas.template import Template as RequiredTemplate
-from app.schemas.template import TemplateCreate
+from app.schemas.template import TemplateCreate, TemplateUpdate
 
 
 class CRUDTemplate:
@@ -65,7 +65,7 @@ class CRUDTemplate:
                                                         )
         await db.commit()
 
-    async def update_template(self, db: AsyncSession, template_id: int, template_in: RequiredTemplate):
+    async def update_template(self, db: AsyncSession, template_id: int, template_in: TemplateUpdate):
         is_unique: bool = await self.is_unique_template_name(db=db,
                                                              template_name=template_in.name,
                                                              template_id=template_id)
@@ -76,7 +76,7 @@ class CRUDTemplate:
 
         query = (
             update(self.model)
-            .where(self.model.id == template_in.id)
+            .where(self.model.id == template_id)
             .values(name=template_in.name)
             .returning(Template)
         )
