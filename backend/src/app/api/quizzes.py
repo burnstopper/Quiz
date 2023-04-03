@@ -15,7 +15,7 @@ async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)):
     Create new quiz
     """
 
-    error: str | None = await crud_quizzes.create_new_quiz(db=db, quiz_in=quiz_in)
+    error: None | str = await crud_quizzes.create_new_quiz(db=db, quiz_in=quiz_in)
     if error is not None:
         raise HTTPException(status_code=409, detail=error)
 
@@ -26,7 +26,7 @@ async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depe
     Update quiz by id
     """
 
-    error: str | None = await crud_quizzes.update_quiz(db=db, quiz_id=quiz_id, quiz_in=quiz_in)
+    error: None | str = await crud_quizzes.update_quiz(db=db, quiz_id=quiz_id, quiz_in=quiz_in)
     if error is not None:
         raise HTTPException(status_code=409, detail=error)
 
@@ -51,8 +51,8 @@ async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Qu
     Get quiz by id
     """
 
-    quiz: Quiz | None
-    error: str | None
+    quiz: None | Quiz
+    error: None | str
 
     quiz, error = await crud_quizzes.get_quiz_by_id(db, quiz_id=quiz_id)
     if error is not None:
@@ -62,7 +62,7 @@ async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Qu
 
 
 @router.get('/{quiz_id}/respondent/{respondent_id}')
-async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: Session = Depends(get_db)) -> bool:
+async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession = Depends(get_db)) -> bool:
     """
     Check has respondent access to quiz
     """
