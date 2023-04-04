@@ -5,10 +5,11 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     # url naming: https://docs.sqlalchemy.org/en/20/core/engines.html#sqlite
-    SQLALCHEMY_DATABASE_URI: str
+    SQLALCHEMY_DATABASE_URL: str
 
     BEARER_TOKEN: str
     HOST: str
+    USER_PORT: str
 
     class Config:
         # case_sensitive: https://docs.pydantic.dev/usage/settings/#environment-variable-names
