@@ -1,13 +1,20 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, Header, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
+
 from app.database.dependencies import get_db
+
 from app.schemas.quiz import QuizCreate, QuizUpdate
 from app.schemas.quiz import Quiz as RequestedQuiz
+
 from app.models.quiz import Quiz
+from app.models.quiz_respondent import QuizRespondent
+
+from app.api.token import get_respondent_id_by_token
 
 
 async def check_is_quiz_name_unique(quiz_name: str, db: AsyncSession) -> bool:
@@ -45,6 +52,20 @@ async def check_quiz_id_is_valid(quiz_id: int, db: AsyncSession) -> bool:
     if max_id is None:
         max_id = 0
     return quiz_id <= max_id
+
+
+async def has_respondent_added_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession) -> bool:
+    query = (
+        select(QuizRespondent)
+        .where(
+            (QuizRespondent.quiz_id == quiz_id) & (QuizRespondent.respondent_id == respondent_id)
+        )
+    )
+
+    quiz_respondent: QuizRespondent = (await db.execute(query)).scalar()
+    if quiz_respondent is None:
+        return False
+    return True
 
 
 router = APIRouter()
@@ -107,3 +128,13 @@ async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession 
     """
 
     return await crud_quiz_respondents.check_access_to_quizz(quiz_id=quiz_id, respondent_id=respondent_id, db=db)
+
+
+@router.post('/{quiz_id}/add/', status_code=status.HTTP_200_OK)
+async def add_respondent_to_quiz(quiz_id: int, token: Annotated[str, Header()], db: AsyncSession = Depends(get_db)):
+    respondent_id: int = await get_respondent_id_by_token(respondent_token=token)
+
+    if has_respondent_added_to_quiz(quiz_id=quiz_id, respondent_id=respondent_id, db=db):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f'Respondent has already added to this quiz')
+
+    await crud_quiz_respondents.add_respondent(quiz_id=quiz_id, respondent_id=respondent_id, db=db)
