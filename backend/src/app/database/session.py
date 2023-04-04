@@ -7,7 +7,7 @@ from app.database.base import *
 
 # https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html
 # turn on 'echo=True' only for testing purposes
-engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI, echo=False)
+engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 

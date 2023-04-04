@@ -11,7 +11,7 @@ from app.core.config import settings
 from app.database.base import *
 
 TEST_SQLALCHEMY_DATABASE_URI = "sqlite+aiosqlite:///tests/test_storage/test_quizzes_database.db"
-settings.SQLALCHEMY_DATABASE_URI = TEST_SQLALCHEMY_DATABASE_URI
+settings.SQLALCHEMY_DATABASE_URL = TEST_SQLALCHEMY_DATABASE_URI
 
 from app.database.dependencies import get_db
 from app.main import app
