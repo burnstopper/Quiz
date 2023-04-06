@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from app.schemas.quiz import Quiz
 
 # https://fastapi.tiangolo.com/tutorial/sql-databases/#create-the-pydantic-models
 # not a @dataclass because dict() method is required in CRUD
@@ -16,6 +16,7 @@ class TemplateCreate(TemplateBase):
 class Template(TemplateCreate):
     id: int = Field(ge=1)
     tests_names: list[str] | None
+    quizzes: list[Quiz] | None
 
     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
     class Config:
