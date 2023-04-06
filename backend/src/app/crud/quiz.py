@@ -57,6 +57,13 @@ class CRUDQuiz:
 
         return (await db.execute(query)).scalar()
 
+    async def get_guizzes_by_template_id(self, template_id: int, db: AsyncSession) -> list[Quiz]:
+        query = (
+            select(self.model)
+            .where(self.model.template_id == template_id)
+        )
+
+        return list((await db.execute(query)).scalars().all())
 
 
 crud = CRUDQuiz(Quiz)
