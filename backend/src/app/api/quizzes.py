@@ -1,19 +1,15 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Header, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.checkers import check_id_is_valid
+from app.api.checkers import check_is_name_unique
 from app.crud.quiz import crud as crud_quizzes
-from app.crud.quiz_respondents import crud as crud_quiz_respondents
-
 from app.database.dependencies import get_db
-
-from app.schemas.quiz import QuizCreate, QuizUpdate
-from app.schemas.quiz import Quiz as RequestedQuiz
-
 from app.models.quiz import Quiz
-
-from app.api.checkers import check_is_name_unique, check_conflicts_with_other_names
-from app.api.checkers import check_id_is_valid, has_respondent_added_to_quiz
+from app.schemas.quiz import Quiz as RequestedQuiz
+from app.schemas.quiz import QuizCreate, QuizUpdate
 
 router = APIRouter()
 

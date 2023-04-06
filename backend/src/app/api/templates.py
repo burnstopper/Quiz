@@ -1,22 +1,16 @@
-from typing import Dict, List
-
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
 
+from app.api.checkers import check_is_name_unique, check_id_is_valid, get_max_id
+from app.crud.quiz import crud as crud_quizzes
 from app.crud.template import crud as crud_templates
 from app.crud.template_tests import crud as crud_template_tests
-from app.crud.quiz import crud as crud_quizzes
-
 from app.database.dependencies import get_db
-from app.schemas.template import TemplateCreate, TemplateUpdate
-from app.schemas.template import Template as RequestedTemplate
-from app.schemas.template_tests import TemplateTest
 from app.models.quiz import Quiz
-
 from app.models.template import Template
-
-from app.api.checkers import check_is_name_unique, check_conflicts_with_other_names, check_id_is_valid, get_max_id
+from app.schemas.template import Template as RequestedTemplate
+from app.schemas.template import TemplateCreate, TemplateUpdate
+from app.schemas.template_tests import TemplateTest
 
 
 async def convert_tests(tests: list[TemplateTest]) -> list[int]:

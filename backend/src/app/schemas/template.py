@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
+
 from app.schemas.quiz import Quiz
+
 
 # https://fastapi.tiangolo.com/tutorial/sql-databases/#create-the-pydantic-models
 # not a @dataclass because dict() method is required in CRUD

@@ -1,10 +1,11 @@
-from typing import Type, Union
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Type
+
 from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.quiz import Quiz
-from app.models.template import Template
 from app.models.quiz_respondent import QuizRespondent
+from app.models.template import Template
 
 
 async def check_is_name_unique(model: Type[Quiz | Template], item_name: str, db: AsyncSession) -> bool:

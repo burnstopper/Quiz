@@ -1,11 +1,9 @@
 from typing import Type
 
-from sqlalchemy import select, func, update
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud.template_tests import crud as crud_template_tests
 from app.models.template import Template
-from app.schemas.template import Template as RequiredTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
 
 
