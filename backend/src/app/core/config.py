@@ -9,7 +9,7 @@ class Settings(BaseSettings):
 
     BEARER_TOKEN: str
     HOST: str
-    USER_PORT: str
+    TOKEN_SERVICE_PORT: str
 
     class Config:
         # case_sensitive: https://docs.pydantic.dev/usage/settings/#environment-variable-names
