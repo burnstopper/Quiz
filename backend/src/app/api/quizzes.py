@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.checkers import check_id_is_valid
 from app.api.checkers import check_is_name_unique
 from app.crud.quiz import crud as crud_quizzes
+from app.crud.quiz_respondents import crud as crud_quiz_respondents
 from app.database.dependencies import get_db
 from app.models.quiz import Quiz
 from app.schemas.quiz import Quiz as RequestedQuiz
@@ -47,12 +48,22 @@ async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depe
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=list[RequestedQuiz])
-async def get_all_quizzes(db: AsyncSession = Depends(get_db)) -> list[RequestedQuiz]:
+async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_db)) -> list[RequestedQuiz]:
     """
-    Get all quizzes
+    Get all quizzes or all respondent quizzes
     """
 
-    return await crud_quizzes.get_all_quizzes(db=db)
+    if respondent_id is None:
+        return await crud_quizzes.get_all_quizzes(db=db)
+
+    quizzes_ids: list[int] = await crud_quiz_respondents.get_respondent_quizzes(respondent_id=respondent_id, db=db)
+
+    quizzes: list[Quiz | None] = [None] * len(quizzes_ids)
+    for i in range(len(quizzes_ids)):
+        quiz: Quiz = await crud_quizzes.get_quiz_by_id(quiz_id=quizzes_ids[i], db=db)
+        quizzes[i] = quiz
+
+    return quizzes
 
 
 @router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)
