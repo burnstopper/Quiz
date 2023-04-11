@@ -1,0 +1,8 @@
+{
+  "name": "cookielib",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "js-cookie": "^3.0.1"
+  }
+}
