@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=RequestedQuiz)
-async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -> RequestedQuiz | None:
+async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -> Quiz | None:
     """
     Create new quiz
     """
@@ -24,31 +24,31 @@ async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -
     is_unique: bool = await check_is_name_unique(model=Quiz, item_name=quiz_in.name, db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail=f'Quiz with this name has already been created')
+                            detail='Quiz with this name has already been created')
 
     return await crud_quizzes.create_new_quiz(quiz_in=quiz_in, db=db)
 
 
 @router.put('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)
-async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depends(get_db)) -> RequestedQuiz | None:
+async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depends(get_db)) -> Quiz | None:
     """
     Update quiz by id
     """
 
     is_valid: bool = await check_id_is_valid(model=Quiz, item_id=quiz_id, db=db)
     if not is_valid:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Quiz with this id has does not exist')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id has does not exist')
 
     is_unique: bool = await check_is_name_unique(model=Quiz, item_name=quiz_in.name, db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail=f'Quiz with this name has already been created')
+                            detail='Quiz with this name has already been created')
 
     return await crud_quizzes.update_quiz(quiz_id=quiz_id, quiz_in=quiz_in, db=db)
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=list[RequestedQuiz])
-async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_db)) -> list[RequestedQuiz]:
+async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_db)) -> list[Quiz]:
     """
     Get all quizzes or all respondent quizzes
     """
@@ -60,8 +60,7 @@ async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_
 
     quizzes: list[Quiz | None] = [None] * len(quizzes_ids)
     for i in range(len(quizzes_ids)):
-        quiz: Quiz = await crud_quizzes.get_quiz_by_id(quiz_id=quizzes_ids[i], db=db)
-        quizzes[i] = quiz
+        quizzes[i] = await crud_quizzes.get_quiz_by_id(quiz_id=quizzes_ids[i], db=db)
 
     return quizzes
 
@@ -74,7 +73,7 @@ async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Qu
 
     is_valid: bool = await check_id_is_valid(model=Quiz, item_id=quiz_id, db=db)
     if not is_valid:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Quiz with this id has does not exist')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id has does not exist')
 
     return await crud_quizzes.get_quiz_by_id(quiz_id=quiz_id, db=db)
 
