@@ -33,7 +33,7 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
     is_unique: bool = await check_is_name_unique(model=Template, item_name=template_in.name, db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail=f'Template with this name has already been created')
+                            detail='Template with this name has already been created')
 
     new_template: Template = await crud_templates.create_template(template_in=template_in, db=db)
 
@@ -57,12 +57,12 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
 
     is_valid: bool = await check_id_is_valid(model=Template, item_id=template_id, db=db)
     if not is_valid:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Template with this id has does not exist')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id has does not exist')
 
     is_unique: bool = await check_is_name_unique(model=Template, item_name=template_in.name, db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail=f'Template with this name has already been created')
+                            detail='Template with this name has already been created')
 
     updated_template: Template = await crud_templates.update_template(template_id=template_id, template_in=template_in,
                                                                       db=db)
@@ -115,7 +115,7 @@ async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db
 
     is_valid: bool = await check_id_is_valid(model=Template, item_id=template_id, db=db)
     if not is_valid:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Template with this id has does not exist')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id has does not exist')
 
     template: Template = await crud_templates.get_template_by_id(template_id=template_id, db=db)
 
