@@ -27,7 +27,7 @@ router = APIRouter()
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=RequestedTemplate)
 async def create_template(template_in: TemplateCreate, db: AsyncSession = Depends(get_db)) -> RequestedTemplate | None:
     """
-    Create template
+    Create a new template
     """
 
     is_unique: bool = await check_is_name_unique(model=Template, item_name=template_in.name, db=db)
@@ -52,7 +52,7 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
 async def update_template(template_id: int, template_in: TemplateUpdate,
                           db: AsyncSession = Depends(get_db)) -> RequestedTemplate | None:
     """
-    Update template by id
+    Update the template by id
     """
 
     is_valid: bool = await check_id_is_valid(model=Template, item_id=template_id, db=db)
@@ -110,7 +110,7 @@ async def get_all_templates(db: AsyncSession = Depends(get_db)) -> list[Requeste
 @router.get('/{template_id}', status_code=status.HTTP_200_OK, response_model=RequestedTemplate)
 async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db)) -> RequestedTemplate | None:
     """
-    Get template by id
+    Get the template by id
     """
 
     is_valid: bool = await check_id_is_valid(model=Template, item_id=template_id, db=db)

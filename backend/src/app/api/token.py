@@ -13,7 +13,7 @@ router = APIRouter()
 @router.get('/{respondent_token}', status_code=status.HTTP_200_OK)
 async def get_respondent_id_by_token(respondent_token: str) -> dict[str, int]:
     """
-    Get respondent id by token
+    Get the respondent id by token
     """
 
     # sets retries amount to 10 and if after this User microservice does not respond - raise normal exception (5xx)
@@ -39,7 +39,7 @@ async def get_respondent_id_by_token(respondent_token: str) -> dict[str, int]:
 @router.post('/create_respondent', status_code=status.HTTP_201_CREATED)
 async def create_new_respondent() -> dict[str, str]:
     """
-    Create new respondent
+    Create a new respondent
     """
 
     # sets retries amount to 10 and if after this User microservice does not respond - raise normal exception (5xx)

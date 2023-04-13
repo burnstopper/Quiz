@@ -19,7 +19,7 @@ router = APIRouter()
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=RequestedQuiz)
 async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -> Quiz | None:
     """
-    Create new quiz
+    Create a new quiz
     """
 
     is_unique: bool = await check_is_name_unique(model=Quiz, item_name=quiz_in.name, db=db)
@@ -33,7 +33,7 @@ async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -
 @router.put('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)
 async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depends(get_db)) -> Quiz | None:
     """
-    Update quiz by id
+    Update the quiz by id
     """
 
     is_valid: bool = await check_id_is_valid(model=Quiz, item_id=quiz_id, db=db)
@@ -51,7 +51,7 @@ async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depe
 @router.get('/', status_code=status.HTTP_200_OK, response_model=list[RequestedQuiz])
 async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_db)) -> list[Quiz]:
     """
-    Get all quizzes or all respondent quizzes
+    Get all existing quizzes or all respondent quizzes
     """
 
     if respondent_id is None:
@@ -69,7 +69,7 @@ async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_
 @router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)
 async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Quiz | None:
     """
-    Get quiz by id
+    Get the quiz by id
     """
 
     is_valid: bool = await check_id_is_valid(model=Quiz, item_id=quiz_id, db=db)
@@ -82,7 +82,7 @@ async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Qu
 @router.get('/{quiz_id}/respondent/{respondent_id}')
 async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession = Depends(get_db)) -> bool:
     """
-    Check has respondent access to quiz
+    Check has the respondent access to quiz
     """
 
     return await has_respondent_added_to_quiz(quiz_id=quiz_id, respondent_id=respondent_id, db=db)
