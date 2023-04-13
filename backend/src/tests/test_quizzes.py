@@ -22,7 +22,7 @@ async def test_create_quiz(async_client: AsyncClient):
 
     # test creating a new quiz with the name that already exists
     response = await async_client.post(url='/api/quizzes/', json={
-        'name': 'Quiz 1 ',
+        'name': ' Quiz 1 ',
         'description': 'Create Quiz 1',
         'template_id': 1
     })
@@ -51,7 +51,7 @@ async def test_update_quiz(async_client: AsyncClient):
     response = await async_client.put(url='/api/quizzes/1', json={
         'name': 'Updated Quiz 1',
         'description': 'Update Quiz 1',
-        'template_id': 2
+        'template_id': 1
     })
 
     assert response.status_code == status.HTTP_200_OK
@@ -59,7 +59,7 @@ async def test_update_quiz(async_client: AsyncClient):
     assert response.json() == {
         'name': 'Updated Quiz 1',
         'description': 'Update Quiz 1',
-        'template_id': 2,
+        'template_id': 1,
         'id': 1
     }
 
@@ -67,7 +67,7 @@ async def test_update_quiz(async_client: AsyncClient):
     response = await async_client.put(url='/api/quizzes/3', json={
         'name': 'Updated Quiz 1',
         'description': 'Update Quiz 1',
-        'template_id': 2
+        'template_id': 1
     })
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -76,9 +76,9 @@ async def test_update_quiz(async_client: AsyncClient):
 
     # test updating the quiz with the name that already exists
     response = await async_client.put(url='/api/quizzes/2', json={
-        'name': 'Updated Quiz 1 ',
+        'name': ' Updated Quiz 1 ',
         'description': 'Update Quiz 2',
-        'template_id': 3
+        'template_id': 2
     })
 
     assert response.status_code == status.HTTP_409_CONFLICT
@@ -96,7 +96,7 @@ async def test_get_quizzes(async_client: AsyncClient):
         {
             'name': 'Updated Quiz 1',
             'description': 'Update Quiz 1',
-            'template_id': 2,
+            'template_id': 1,
             'id': 1
         },
         {
@@ -117,7 +117,7 @@ async def test_get_quiz_by_id(async_client: AsyncClient):
     assert response.json() == {
         'name': 'Updated Quiz 1',
         'description': 'Update Quiz 1',
-        'template_id': 2,
+        'template_id': 1,
         'id': 1
     }
 
