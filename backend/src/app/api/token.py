@@ -1,11 +1,9 @@
-from typing import Dict
-
-from fastapi import APIRouter, Header, Depends, status, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.database.dependencies import get_db
-from app.core.config import settings
-import httpx
 import json
+
+import httpx
+from fastapi import APIRouter, status, HTTPException
+
+from app.core.config import settings
 
 router = APIRouter()
 

@@ -4,8 +4,8 @@ from fastapi import APIRouter, Header, Depends, status, HTTPException
 from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.token import get_respondent_id_by_token
 from app.api.checkers import check_id_is_valid, check_is_name_unique, has_respondent_added_to_quiz
+from app.api.token import get_respondent_id_by_token
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
 from app.database.dependencies import get_db

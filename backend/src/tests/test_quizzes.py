@@ -1,6 +1,7 @@
+import json
+
 from fastapi import status
 from httpx import AsyncClient
-import json
 
 
 async def test_create_quiz(async_client: AsyncClient):
