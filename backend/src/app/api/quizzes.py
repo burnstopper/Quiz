@@ -1,10 +1,11 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Header, Depends, status, HTTPException
+from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.checkers import check_id_is_valid
-from app.api.checkers import check_is_name_unique
+from app.api.token import get_respondent_id_by_token
+from app.api.checkers import check_id_is_valid, check_is_name_unique, has_respondent_added_to_quiz
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
 from app.database.dependencies import get_db
@@ -83,9 +84,31 @@ async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession 
     """
     Check has respondent access to quiz
     """
-    pass
+
+    return await has_respondent_added_to_quiz(quiz_id=quiz_id, respondent_id=respondent_id, db=db)
+
+
+@router.get('/{quiz_id}/add/', status_code=status.HTTP_200_OK, response_class=HTMLResponse)
+async def get_html_page() -> HTMLResponse:
+    html_content = """
+    <html>
+        <head>
+            <title>Some HTML in here</title>
+        </head>
+        <body>
+            <h1>Look ma! HTML!</h1>
+        </body>
+    </html>
+    """
+
+    return HTMLResponse(content=html_content, status_code=200)
 
 
 @router.post('/{quiz_id}/add/', status_code=status.HTTP_200_OK)
 async def add_respondent_to_quiz(quiz_id: int, token: Annotated[str, Header()], db: AsyncSession = Depends(get_db)):
-    pass
+    respondent_id: int = (await get_respondent_id_by_token(token))['respondent_id']
+
+    if await has_respondent_added_to_quiz(quiz_id=quiz_id, respondent_id=respondent_id, db=db):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Respondent has already added to quiz')
+
+    await crud_quiz_respondents.add_respondent(quiz_id=quiz_id, respondent_id=respondent_id, db=db)
