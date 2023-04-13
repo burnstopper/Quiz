@@ -67,7 +67,7 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
     updated_template: Template = await crud_templates.update_template(template_id=template_id, template_in=template_in,
                                                                       db=db)
 
-    await crud_template_tests.update_template_tests(template_id=template_id, tests=template_in.tests_ids)
+    await crud_template_tests.update_template_tests(template_id=template_id, tests=template_in.tests_ids, db=db)
 
     return RequestedTemplate(**{'id': updated_template.id,
                                 'name': updated_template.name,
@@ -121,10 +121,13 @@ async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db
 
     temp_tests: list[TemplateTest] = await crud_template_tests.get_template_tests(template_id=template_id, db=db)
 
+    quizzes: list[Quiz] = await crud_quizzes.get_guizzes_by_template_id(template_id=template_id, db=db)
+
     tests: list[int] = await convert_tests(temp_tests)
 
     return RequestedTemplate(**{'id': template.id,
                                 'name': template.name,
-                                'tests_ids': tests
+                                'tests_ids': tests,
+                                'quizzes': quizzes
                                 }
                              )
