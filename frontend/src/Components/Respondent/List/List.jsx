@@ -31,7 +31,7 @@ export default class List extends Component {
 				// let id = "123213121";
 				if (!token || !id) {
 					token = await axios
-						.get("localhost:8001/token/create-respondent")
+						.post("localhost:8001/token/create-respondent")
 						.then((x) => x.data)
 						.catch(() => {});
 					CookieLib.setCookieToken(token);

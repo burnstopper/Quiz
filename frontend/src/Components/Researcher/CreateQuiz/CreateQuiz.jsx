@@ -49,7 +49,7 @@ class Quiz extends Component {
 				// let id = "123213121";
 				if (!token || !id) {
 					token = await axios
-						.get("/token/create-respondent")
+						.post("/token/create-respondent")
 						.then((x) => x.data)
 						.catch(() => {});
 					CookieLib.setCookieToken(token);
