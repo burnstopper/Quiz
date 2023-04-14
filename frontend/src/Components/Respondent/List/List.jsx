@@ -31,7 +31,7 @@ export default class List extends Component {
 				// let id = "123213121";
 				if (!token || !id) {
 					token = await axios
-						.get("/token/create-respondent")
+						.get("localhost:8001/token/create-respondent")
 						.then((x) => x.data)
 						.catch(() => {});
 					CookieLib.setCookieToken(token);
@@ -40,7 +40,7 @@ export default class List extends Component {
 			},
 			getQuizes: async () => {
 				let quizes = await axios
-					.get("/quizes", {
+					.get("localhost:8001/quizes", {
 						params: {
 							respondent_id: this.state.id,
 							results: true,
@@ -48,6 +48,16 @@ export default class List extends Component {
 						},
 					})
 					.catch(() => {});
+
+				quizes = quizes.map(async (x) => ({
+					...quizes,
+					template: await axios
+						.get(`localhost:8001/templates/${x.template.id}`)
+						.then((x) => x.data),
+					results: await axios.get(`localhost:8001/results`, {
+						params: { quiz_id: x.quiz_id },
+					}),
+				}));
 				// let quizes = [
 				// 	{
 				// 		name: "Квиз 1",
@@ -118,7 +128,7 @@ export default class List extends Component {
 							<Link
 								id="btnQuiz"
 								style={{ textDecoration: "none" }}
-								to={`${x.id}`}
+								to={`${x.quiz_id}`}
 								key={i}
 							>
 								<a id="titleTile">{x.name}</a>

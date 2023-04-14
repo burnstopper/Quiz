@@ -49,7 +49,7 @@ class Quiz extends Component {
 				// let id = "123213121";
 				if (!token || !id) {
 					token = await axios
-						.get("/token/create-respondent")
+						.get("localhost:8001/token/create-respondent")
 						.then((x) => x.data)
 						.catch(() => {});
 					CookieLib.setCookieToken(token);
@@ -58,14 +58,16 @@ class Quiz extends Component {
 			},
 			checkPermission: async () => {
 				let check = await axios
-					.get(`/quizes/${this.state.quiz_id}/respondent/${this.state.id}`)
+					.get(
+						`localhost:8001/quizes/${this.state.quiz_id}/respondent/${this.state.id}`
+					)
 					.then((x) => x.data);
 				// let check = true;
 				this.setState({ check });
 			},
 			getQuiz: async () => {
 				let quiz = await axios
-					.get(`/quizes/${this.state.quiz_id}`, {
+					.get(`localhost:8001/quizes/${this.state.quiz_id}`, {
 						params: {
 							respondent_id: this.state.id,
 							results: true,
@@ -73,6 +75,15 @@ class Quiz extends Component {
 						},
 					})
 					.catch(() => {});
+				quiz = {
+					...quiz,
+					template: await axios
+						.get(`localhost:8001/templates/${quiz.template.id}`)
+						.then((x) => x.data),
+					results: await axios.get(`localhost:8001/results`, {
+						params: { quiz_id: quiz.quiz_id },
+					}),
+				};
 				// let quiz = {
 				// 	name: "Квиз 2",
 				// 	description: "Опрос для БКНАД 211 и БКНАД 212, всем хорошего дня",

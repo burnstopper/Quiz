@@ -45,7 +45,7 @@ class Quiz extends Component {
 		let getData = {
 			getToken: async () => {
 				let token = CookieLib.getCookieToken();
-				let id = await axios.get(`token/${token}/id`);
+				let id = await axios.get(`localhost:8001/token/${token}/id`);
 				// let id = "123213121";
 				if (!token || !id) {
 					token = await axios
@@ -58,13 +58,15 @@ class Quiz extends Component {
 			},
 			checkPermission: async () => {
 				let check = await axios
-					.get(`/token/${this.state.quiz_id}/check_researcher`)
+					.get(`localhost:8001/token/${this.state.quiz_id}/check_researcher`)
 					.then((x) => x.data);
 				// let check = true;
 				this.setState({ check });
 			},
 			getTemplates: async () => {
-				let templates = await axios.get(`/templates`).then((x) => x.data);
+				let templates = await axios
+					.get(`localhost:8001/templates`)
+					.then((x) => x.data);
 				// let templates = [
 				// 	{
 				// 		name: "Шаблон 1",
@@ -153,9 +155,9 @@ class Quiz extends Component {
 						<select id="select" value={this.state.template_id}>
 							{this.state.templates.map((x) => (
 								<option
-									key={x.id}
-									onChange={() => this.setState({ template_id: x.id })}
-									value={x.id}
+									key={x.template_id}
+									onChange={() => this.setState({ template_id: x.template_id })}
+									value={x.template_id}
 								>
 									{x.name}
 								</option>
