@@ -1,53 +1,30 @@
-from typing import Type
-
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.crud.quiz import CRUDQuiz
+from app.crud.template import CRUDTemplate
 from app.models.quiz import Quiz
 from app.models.quiz_respondent import QuizRespondent
 from app.models.template import Template
 
 
-async def check_is_name_unique(model: Type[Quiz | Template], item_name: str, db: AsyncSession) -> bool:
-    query = (
-        select(model.name)
-        .where(model.name == item_name.strip())
-    )
-
-    is_used_name: str | None = (await db.execute(query)).first()
-    if is_used_name is not None:
+async def check_is_name_unique(crud: CRUDQuiz | CRUDTemplate, item_name: str, db: AsyncSession) -> bool:
+    item: Quiz | Template | None = await crud.select_by_name(item_name=item_name.strip(), db=db)
+    if item is not None:
         return False
     return True
 
 
-async def check_conflicts_with_other_names(model: Type[Quiz | Template], item_id: int, item_name: str,
+async def check_conflicts_with_other_names(crud: CRUDQuiz | CRUDTemplate, item_id: int, item_name: str,
                                            db: AsyncSession) -> bool:
-    query = (
-        select(model.id)
-        .where(model.name == item_name.strip())
-    )
-
-    result_id: int = (await db.execute(query)).scalar()
-    if result_id is None:
+    item: Quiz | Template | None = await crud.select_by_name(item_name=item_name.strip(), db=db)
+    if item is None or item.id == item_id:
         return True
-    elif result_id != item_id:
-        return False
-    return True
+    return False
 
 
-async def get_max_id(model: Type[Quiz | Template], db: AsyncSession) -> int:
-    query = (
-        func.max(model.id)
-    )
-
-    max_id: int = (await db.execute(query)).scalar()
-    if max_id is None:
-        return 0
-    return max_id
-
-
-async def check_id_is_valid(model: Type[Quiz | Template], item_id: int, db: AsyncSession) -> bool:
-    max_id: int = await get_max_id(model, db=db)
+async def check_id_is_valid(crud: CRUDQuiz | CRUDTemplate, item_id: int, db: AsyncSession) -> bool:
+    max_id: int = await crud.get_last_id(db=db)
     return item_id <= max_id
 
 

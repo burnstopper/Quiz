@@ -1,16 +1,12 @@
-from typing import Type
-
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.crud.base import CRUDBase
 from app.models.template import Template
 from app.schemas.template import TemplateCreate, TemplateUpdate
 
 
-class CRUDTemplate:
-    def __init__(self, model: Type[Template]):
-        self.model = model
-
+class CRUDTemplate(CRUDBase[Template]):
     async def create_template(self, template_in: TemplateCreate, db: AsyncSession) -> Template:
         new_template = Template(name=template_in.name.strip())
         db.add(new_template)

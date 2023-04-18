@@ -1,13 +1,17 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.checkers import check_is_name_unique, check_id_is_valid, get_max_id
+from app.api.checkers import check_is_name_unique, check_id_is_valid
+
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.template import crud as crud_templates
 from app.crud.template_tests import crud as crud_template_tests
+
 from app.database.dependencies import get_db
+
 from app.models.quiz import Quiz
 from app.models.template import Template
+
 from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
 from app.schemas.template_tests import TemplateTest
@@ -30,14 +34,14 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
     Create a new template
     """
 
-    is_unique: bool = await check_is_name_unique(model=Template, item_name=template_in.name, db=db)
+    is_unique: bool = await check_is_name_unique(crud=crud_templates, item_name=template_in.name, db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Template with this name has already been created')
 
     new_template: Template = await crud_templates.create_template(template_in=template_in, db=db)
 
-    new_id: int = (await get_max_id(model=Template, db=db)) + 1
+    new_id: int = (await crud_templates.get_last_id(db=db)) + 1
 
     await crud_template_tests.add_tests_to_template(template_id=new_id, tests=template_in.tests_ids, db=db)
 
@@ -55,11 +59,11 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
     Update the template by id
     """
 
-    is_valid: bool = await check_id_is_valid(model=Template, item_id=template_id, db=db)
+    is_valid: bool = await check_id_is_valid(crud=crud_templates, item_id=template_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id has does not exist')
 
-    is_unique: bool = await check_is_name_unique(model=Template, item_name=template_in.name, db=db)
+    is_unique: bool = await check_is_name_unique(crud=crud_templates, item_name=template_in.name, db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Template with this name has already been created')
@@ -92,7 +96,7 @@ async def get_all_templates(db: AsyncSession = Depends(get_db)) -> list[Requeste
 
         template_id, template_name = templates[i].id, templates[i].name
 
-        quizzes: list[Quiz] = await crud_quizzes.get_guizzes_by_template_id(template_id=template_id, db=db)
+        quizzes: list[Quiz] = await crud_quizzes.get_quizzes_by_template_id(template_id=template_id, db=db)
 
         temp_tests: list[TemplateTest] = await crud_template_tests.get_template_tests(template_id=template_id, db=db)
 
@@ -113,7 +117,7 @@ async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db
     Get the template by id
     """
 
-    is_valid: bool = await check_id_is_valid(model=Template, item_id=template_id, db=db)
+    is_valid: bool = await check_id_is_valid(crud=crud_templates, item_id=template_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id has does not exist')
 
@@ -121,7 +125,7 @@ async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db
 
     temp_tests: list[TemplateTest] = await crud_template_tests.get_template_tests(template_id=template_id, db=db)
 
-    quizzes: list[Quiz] = await crud_quizzes.get_guizzes_by_template_id(template_id=template_id, db=db)
+    quizzes: list[Quiz] = await crud_quizzes.get_quizzes_by_template_id(template_id=template_id, db=db)
 
     tests: list[int] = await convert_tests(temp_tests)
 

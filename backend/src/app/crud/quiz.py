@@ -1,16 +1,12 @@
-from typing import Type
-
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.crud.base import CRUDBase
 from app.models.quiz import Quiz
 from app.schemas.quiz import QuizCreate, QuizUpdate
 
 
-class CRUDQuiz:
-    def __init__(self, model: Type[Quiz]):
-        self.model = model
-
+class CRUDQuiz(CRUDBase[Quiz]):
     async def create_new_quiz(self, quiz_in: QuizCreate, db: AsyncSession) -> Quiz:
         new_quiz = Quiz(name=quiz_in.name.strip(),
                         template_id=quiz_in.template_id,
@@ -57,7 +53,7 @@ class CRUDQuiz:
 
         return (await db.execute(query)).scalar()
 
-    async def get_guizzes_by_template_id(self, template_id: int, db: AsyncSession) -> list[Quiz]:
+    async def get_quizzes_by_template_id(self, template_id: int, db: AsyncSession) -> list[Quiz]:
         query = (
             select(self.model)
             .where(self.model.template_id == template_id)
