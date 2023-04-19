@@ -20,6 +20,6 @@ async def test_create_new_respondent_and_get_respondent_id(async_client: AsyncCl
     assert json.loads(response.content)['detail'] == 'Invalid token'
 
     # test getting the respondent id by valid token
-    response = await async_client.get(url=f'/api/token/{respondent_token}')
+    response = await async_client.get(url=f'/api/token/{respondent_token}/id')
 
     assert response.status_code == status.HTTP_200_OK
