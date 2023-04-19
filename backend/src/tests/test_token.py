@@ -13,7 +13,7 @@ async def test_create_new_respondent_and_get_respondent_id(async_client: AsyncCl
     respondent_token: str = json.loads(response.content)['respondent_token']
 
     # test getting the respondent id by invalid token
-    response = await async_client.get(url='/api/token/blablabla')
+    response = await async_client.get(url='/api/token/blablabla/id')
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
 

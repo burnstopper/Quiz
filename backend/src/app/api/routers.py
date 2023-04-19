@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
+from app.database.dependencies import get_db
 
 from app.api.quizzes import router as quizzes_router
 from app.api.templates import router as template_router
@@ -8,11 +10,13 @@ api_router = APIRouter()
 
 api_router.include_router(quizzes_router,
                           prefix='/api/quizzes',
+                          dependencies=[Depends(get_db)],
                           tags=['Quiz']
                           )
 
 api_router.include_router(template_router,
                           prefix='/api/templates',
+                          dependencies=[Depends(get_db)],
                           tags=['Template'])
 
 api_router.include_router(token_router,
