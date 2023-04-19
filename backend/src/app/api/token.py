@@ -2,14 +2,15 @@ import json
 
 import httpx
 from fastapi import APIRouter, status, HTTPException
+from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 
 router = APIRouter()
 
 
-@router.post('/create_respondent', status_code=status.HTTP_201_CREATED)
-async def create_new_respondent() -> dict[str, str]:
+@router.post('/create_respondent', status_code=status.HTTP_201_CREATED, response_class=JSONResponse)
+async def create_new_respondent() -> JSONResponse:
     """
     Create a new respondent
     """
@@ -23,11 +24,11 @@ async def create_new_respondent() -> dict[str, str]:
                                               headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                             ).text
 
-    return {'respondent_token': respondent_token}
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content={'respondent_token': respondent_token})
 
 
-@router.get('/{respondent_token}/id', status_code=status.HTTP_200_OK)
-async def get_respondent_id_by_token(respondent_token: str) -> dict[str, int]:
+@router.get('/{respondent_token}/id', status_code=status.HTTP_200_OK, response_class=JSONResponse)
+async def get_respondent_id_by_token(respondent_token: str) -> JSONResponse:
     """
     Get the respondent id by token
     """
@@ -49,11 +50,11 @@ async def get_respondent_id_by_token(respondent_token: str) -> dict[str, int]:
 
         respondent_id = int(response.text)
 
-    return {'respondent_id': respondent_id}
+    return JSONResponse(status_code=status.HTTP_200_OK, content={'respondent_id': respondent_id})
 
 
-@router.get('/{token}/check_researcher')
-async def check_is_researcher(user_token: str) -> dict[str, bool]:
+@router.get('/{token}/check_researcher', status_code=status.HTTP_200_OK, response_class=JSONResponse)
+async def check_is_researcher(user_token: str) -> JSONResponse:
     """
     Check is the user a researcher by token
     """
@@ -67,4 +68,4 @@ async def check_is_researcher(user_token: str) -> dict[str, bool]:
                                                      headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                                    )
 
-    return {'is_researcher': is_researcher}
+    return JSONResponse(status_code=status.HTTP_200_OK, content={'is_researcher': is_researcher})
