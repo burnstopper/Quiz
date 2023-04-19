@@ -1,8 +1,9 @@
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.quiz import CRUDQuiz
+from app.crud.quiz_respondents import CRUDQuizRespondent
 from app.crud.template import CRUDTemplate
+
 from app.models.quiz import Quiz
 from app.models.quiz_respondent import QuizRespondent
 from app.models.template import Template
@@ -28,15 +29,11 @@ async def check_id_is_valid(crud: CRUDQuiz | CRUDTemplate, item_id: int, db: Asy
     return item_id <= max_id
 
 
-async def has_respondent_added_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession) -> bool:
-    query = (
-        select(QuizRespondent)
-        .where(
-            (QuizRespondent.quiz_id == quiz_id) & (QuizRespondent.respondent_id == respondent_id)
-        )
-    )
+async def has_respondent_added_to_quiz(crud: CRUDQuizRespondent, quiz_id: int,
+                                       respondent_id: int, db: AsyncSession) -> bool:
+    quiz_respondent: QuizRespondent = await crud.select_respondent_quiz(quiz_id=quiz_id, respondent_id=respondent_id,
+                                                                        db=db)
 
-    quiz_respondent: QuizRespondent = (await db.execute(query)).scalar()
     if quiz_respondent is None:
         return False
     return True

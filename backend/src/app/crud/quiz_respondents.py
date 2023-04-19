@@ -15,6 +15,16 @@ class CRUDQuizRespondent:
         db.add(new_quiz_respondent)
         await db.commit()
 
+    async def select_respondent_quiz(self, quiz_id: int, respondent_id: int, db: AsyncSession) -> QuizRespondent:
+        query = (
+            select(self.model)
+            .where(
+                (self.model.quiz_id == quiz_id) & (self.model.respondent_id == respondent_id)
+            )
+        )
+
+        return (await db.execute(query)).scalar()
+
     async def get_respondent_quizzes(self, respondent_id: int, db: AsyncSession) -> list[int]:
         query = (
             select(self.model.quiz_id)
