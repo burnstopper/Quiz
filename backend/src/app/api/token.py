@@ -8,7 +8,25 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.get('/{respondent_token}', status_code=status.HTTP_200_OK)
+@router.post('/create_respondent', status_code=status.HTTP_201_CREATED)
+async def create_new_respondent() -> dict[str, str]:
+    """
+    Create a new respondent
+    """
+
+    # sets retries amount to 10 and if after this User microservice does not respond - raise normal exception (5xx)
+    transport = httpx.AsyncHTTPTransport(retries=10)
+    timeout = httpx.Timeout(1.0)
+    async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
+        respondent_token = (await client.post(f'http://{settings.HOST}:{settings.TOKEN_SERVICE_PORT}'
+                                              f'/api/user/new_respondent',
+                                              headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
+                            ).text
+
+    return {'respondent_token': respondent_token}
+
+
+@router.get('/{respondent_token}/id', status_code=status.HTTP_200_OK)
 async def get_respondent_id_by_token(respondent_token: str) -> dict[str, int]:
     """
     Get the respondent id by token
@@ -34,19 +52,19 @@ async def get_respondent_id_by_token(respondent_token: str) -> dict[str, int]:
     return {'respondent_id': respondent_id}
 
 
-@router.post('/create_respondent', status_code=status.HTTP_201_CREATED)
-async def create_new_respondent() -> dict[str, str]:
+@router.get('/{token}/check_researcher')
+async def check_is_researcher(user_token: str) -> dict[str, bool]:
     """
-    Create a new respondent
+    Check is the user a researcher by token
     """
 
     # sets retries amount to 10 and if after this User microservice does not respond - raise normal exception (5xx)
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        respondent_token = (await client.post(f'http://{settings.HOST}:{settings.TOKEN_SERVICE_PORT}'
-                                              f'/api/user/new_respondent',
-                                              headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
-                            ).text
+        is_researcher: bool = bool(await client.post(f'http://{settings.HOST}:{settings.TOKEN_SERVICE_PORT}'
+                                                     f'/api/check_researcher/{user_token}',
+                                                     headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
+                                   )
 
-    return {'respondent_token': respondent_token}
+    return {'is_researcher': is_researcher}
