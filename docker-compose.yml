@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+    quiz-backend:
+      container_name: quiz-backend
+      build: ./quiz/backend
+      networks:
+        - local-net
+
+
+    quiz-frontend:
+      extends:
+        file: quiz/docker-compose.yml
+        service: quiz-frontend
+
+
+    nginx:
+      container_name: nginx
+      build:
+        context: ./nginx
+      ports:
+        - "8003:8003"
+      volumes:
+        - quiz-front:/usr/share/nginx/quiz/
+      depends_on:
+        - quiz-backend
+        - quiz-frontend
+      networks:
+        - local-net
+
+
+volumes:
+  quiz-front:
+
+
+networks:
+  local-net:
+    driver: bridge
