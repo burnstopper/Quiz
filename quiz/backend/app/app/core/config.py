@@ -5,10 +5,25 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     # url naming: https://docs.sqlalchemy.org/en/20/core/engines.html#sqlite
     SQLALCHEMY_DATABASE_URL: str
-
     BEARER_TOKEN: str
-    TOKEN_SERVICE_HOST: str
-    TOKEN_SERVICE_PORT: str
+    
+    BURNOUT_SERVICE_NAME: str
+    BURNOUT_SERVICE_URL: str
+    BURNOUT_SERVICE_BEARER_TOKEN: str
+
+    FATIGUE_SERVICE_NAME: str
+    FATIGUE_SERVICE_URL: str
+    FATIGUE_SERVICE_BEARER_TOKEN: str
+
+    COPING_SERVICE_NAME: str
+    COPING_SERVICE_URL: str
+    COPING_SERVICE_BEARER_TOKEN: str
+
+    SPB_SERVICE_NAME: str
+    SPB_SERVICE_URL: str
+    SPB_SERVICE_BEARER_TOKEN: str
+
+    TOKEN_SERVICE_URL: str
 
     class Config:
         # case_sensitive: https://docs.pydantic.dev/usage/settings/#environment-variable-names
