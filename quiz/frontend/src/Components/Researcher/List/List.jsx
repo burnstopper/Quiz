@@ -5,7 +5,7 @@ import CookieLib from "../../../cookielib/index";
 import axios from "axios";
 import LoadingScreen from "react-loading-screen";
 import { Spinner } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 let i = 0;
 function isBlank(str) {
@@ -38,11 +38,18 @@ export default class List extends Component {
 				}
 				this.setState({ token, id });
 			},
+			checkPermission: async () => {
+				let check = await axios
+					.get(`/token/${this.state.quiz_id}/check_researcher`)
+					.then((x) => x.data);
+				// let check = true;
+				this.setState({ check });
+			},
 			getQuizes: async () => {
 				let quizes = await axios
 					.get("/quizes", {
 						params: {
-							respondent_id: this.state.id,
+							// respondent_id: this.state.id,
 							results: true,
 							template: true,
 						},
@@ -105,16 +112,33 @@ export default class List extends Component {
 					<span className="sr-only">Loading...</span>
 				</Spinner>
 			</>
-		) : (
+		) : this.state.check ? (
 			<div className="parent">
 				<div id="upTile">
-					<p id="text">Доступные опросы</p>
-					<input
-						id="search"
-						type="text"
-						placeholder="Поиск.."
-						onChange={(e) => this.setState({ filter: e.target.value })}
-					/>
+					<p id="text">Меню опросов</p>
+					<div className="component-menu">
+						<input
+							id="search"
+							type="text"
+							placeholder="Поиск.."
+							onChange={(e) => this.setState({ filter: e.target.value })}
+						/>
+
+						<button
+							onClick={() => (window.location.href = "/researcher/templates")}
+							type="submit"
+							id="btnPlay"
+						>
+							Шаблоны
+						</button>
+						<button
+							type="submit"
+							onClick={() => (window.location.href = "/quizes/create")}
+							id="btnPlay"
+						>
+							Создать опрос
+						</button>
+					</div>
 				</div>
 
 				<div id="btnTile">
@@ -126,9 +150,9 @@ export default class List extends Component {
 						)
 						.map((x, i) => (
 							<Link
-								id="btnQuiz"
+								id="btnQuizes"
 								style={{ textDecoration: "none" }}
-								to={`${x.quiz_id}`}
+								to={`#`}
 								key={i}
 							>
 								<a id="titleTile">{x.name}</a>
@@ -144,6 +168,22 @@ export default class List extends Component {
 									)}
 									%
 								</a>
+
+								<div className="quizComponentContainer">
+									<button
+										onClick={() => (window.location.href += `/${x.id}`)}
+										id="quizBtnComponent"
+									>
+										Открыть
+									</button>
+
+									<button
+										onClick={() => (window.location.href += `/${x.id}/edit`)}
+										id="quizBtnComponent"
+									>
+										Редактировать
+									</button>
+								</div>
 							</Link>
 						))}
 				</div>
@@ -162,6 +202,8 @@ export default class List extends Component {
 					</div>
 				</div> */}
 			</div>
+		) : (
+			<Navigate to="/quizes" replace={true} />
 		);
 	}
 }

@@ -10,6 +10,8 @@ import Respondent from "./Components/Respondent/List/List";
 import Header from "./Components/Menu/Header/Header";
 import Quiz from "./Components/Respondent/Quiz/Quiz";
 import CreateQuiz from "./Components/Researcher/CreateQuiz/CreateQuiz";
+import List from "./Components/Researcher/List/List";
+import Templates from "./Components/Researcher/Templates/Template";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 let id = Math.floor(Math.random() * 1000000 + 10000000);
@@ -26,6 +28,8 @@ root.render(
 				<Route path="/quizes" element={<Respondent id={id} />} />
 				<Route path="/quizes/:quiz" element={<Quiz id={id} />} />
 				<Route path="/quizes/create" element={<CreateQuiz id={id} />} />
+				<Route path="/researcher/quizes" element={<List id={id} />} />
+				<Route path="/researcher/templates" element={<Templates id={id} />} />
 			</Routes>
 		</div>
 	</Router>

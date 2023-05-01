@@ -49,7 +49,7 @@ class Quiz extends Component {
 				// let id = "123213121";
 				if (!token || !id) {
 					token = await axios
-						.post("localhost:8001/token/create-respondent")
+						.post("/token/create-respondent")
 						.then((x) => x.data)
 						.catch(() => {});
 					CookieLib.setCookieToken(token);
@@ -58,16 +58,14 @@ class Quiz extends Component {
 			},
 			checkPermission: async () => {
 				let check = await axios
-					.get(
-						`localhost:8001/quizes/${this.state.quiz_id}/respondent/${this.state.id}`
-					)
+					.get(`/quizes/${this.state.quiz_id}/respondent/${this.state.id}`)
 					.then((x) => x.data);
 				// let check = true;
 				this.setState({ check });
 			},
 			getQuiz: async () => {
 				let quiz = await axios
-					.get(`localhost:8001/quizes/${this.state.quiz_id}`, {
+					.get(`/quizes/${this.state.quiz_id}`, {
 						params: {
 							respondent_id: this.state.id,
 							results: true,
@@ -78,9 +76,9 @@ class Quiz extends Component {
 				quiz = {
 					...quiz,
 					template: await axios
-						.get(`localhost:8001/templates/${quiz.template.id}`)
+						.get(`/templates/${quiz.template.id}`)
 						.then((x) => x.data),
-					results: await axios.get(`localhost:8001/results`, {
+					results: await axios.get(`/results`, {
 						params: { quiz_id: quiz.quiz_id },
 					}),
 				};
@@ -124,10 +122,10 @@ class Quiz extends Component {
 				</div>
 
 				<div id="btnTile">
-					{this.state.quiz.template.tests.map((x, i) => {
+					{this.state.quiz.template.tests_ids.map((x, i) => {
 						console.log(this.state.quiz.results[x]?.length);
 						if (
-							this.state.quiz.results[this.state.quiz.template.tests[i - 1]]
+							this.state.quiz.results[this.state.quiz.template.tests_ids[i - 1]]
 								?.length > 0 ||
 							i === 0
 						)
