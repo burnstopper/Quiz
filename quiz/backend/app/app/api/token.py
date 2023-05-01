@@ -19,7 +19,7 @@ async def create_new_respondent() -> JSONResponse:
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        respondent_token = (await client.post(f'http://{settings.HOST}:{settings.TOKEN_SERVICE_PORT}'
+        respondent_token = (await client.post(f'http://{settings.TOKEN_SERVICE_HOST}:{settings.TOKEN_SERVICE_PORT}'
                                               f'/api/user/new_respondent',
                                               headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                             ).text
@@ -37,7 +37,7 @@ async def get_respondent_id_by_token(respondent_token: str) -> JSONResponse:
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        response = (await client.get(f'http://{settings.HOST}:{settings.TOKEN_SERVICE_PORT}'
+        response = (await client.get(f'http://{settings.TOKEN_SERVICE_HOST}:{settings.TOKEN_SERVICE_PORT}'
                                      f'/api/user/{respondent_token}',
                                      headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                     )
@@ -63,7 +63,7 @@ async def check_is_researcher(user_token: str) -> JSONResponse:
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        is_researcher: bool = bool(await client.post(f'http://{settings.HOST}:{settings.TOKEN_SERVICE_PORT}'
+        is_researcher: bool = bool(await client.post(f'http://{settings.TOKEN_SERVICE_HOST}:{settings.TOKEN_SERVICE_PORT}'
                                                      f'/api/check_researcher/{user_token}',
                                                      headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                                    )

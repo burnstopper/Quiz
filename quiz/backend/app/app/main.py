@@ -1,0 +1,13 @@
+from fastapi import FastAPI
+
+from app.api.routers import api_router
+from app.core.config import settings
+
+app = FastAPI()
+app.include_router(api_router)
+
+if __name__ == '__main__':
+    # Use this for debugging purposes only
+    import uvicorn
+
+    uvicorn.run(app, host='0.0.0.0', port=8001, log_level='debug')

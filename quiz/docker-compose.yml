@@ -1,0 +1,14 @@
+# For building frontend volume
+
+version: "3.9"
+
+services:
+  quiz-frontend:
+    container_name: quiz-frontend
+    build:
+      context: ./frontend
+    volumes:
+      - quiz-front:/app
+
+volumes:
+  quiz-front:
