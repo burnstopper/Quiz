@@ -2,19 +2,28 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.checkers import check_is_name_unique, check_id_is_valid
-
+from app.core.config import settings
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.template import crud as crud_templates
 from app.crud.template_tests import crud as crud_template_tests
-
 from app.database.dependencies import get_db
-
 from app.models.quiz import Quiz
 from app.models.template import Template
-
 from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
 from app.schemas.template_tests import TemplateTest
+
+
+def get_test_names_by_id(test_id: int) -> str:
+    match test_id:
+        case 1:
+            return settings.BURNOUT_SERVICE_NAME
+        case 2:
+            return settings.FATIGUE_SERVICE_NAME
+        case 3:
+            return settings.COPING_SERVICE_NAME
+        case 4:
+            return settings.SPB_SERVICE_NAME
 
 
 async def convert_tests(tests: list[TemplateTest]) -> list[int]:
@@ -45,9 +54,12 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
 
     await crud_template_tests.add_tests_to_template(template_id=new_id, tests=template_in.tests_ids, db=db)
 
+    tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in template_in.tests_ids]
+
     return RequestedTemplate(**{'id': new_id,
                                 'name': new_template.name,
-                                'tests_ids': template_in.tests_ids
+                                'tests_ids': template_in.tests_ids,
+                                'tests_names': tests_names
                                 }
                              )
 
@@ -73,9 +85,12 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
 
     await crud_template_tests.update_template_tests(template_id=template_id, tests=template_in.tests_ids, db=db)
 
+    tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in template_in.tests_ids]
+
     return RequestedTemplate(**{'id': updated_template.id,
                                 'name': updated_template.name,
-                                'tests_ids': template_in.tests_ids
+                                'tests_ids': template_in.tests_ids,
+                                'tests_names': tests_names
                                 }
                              )
 
@@ -102,9 +117,12 @@ async def get_all_templates(db: AsyncSession = Depends(get_db)) -> list[Requeste
 
         tests: list[int] = await convert_tests(temp_tests)
 
+        tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in tests]
+
         results[i] = RequestedTemplate(**{'id': template_id,
                                           'name': template_name,
                                           'tests_ids': tests,
+                                          'tests_names': tests_names,
                                           'quizzes': quizzes
                                           })
 
@@ -129,9 +147,12 @@ async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db
 
     tests: list[int] = await convert_tests(temp_tests)
 
+    tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in tests]
+
     return RequestedTemplate(**{'id': template.id,
                                 'name': template.name,
                                 'tests_ids': tests,
+                                'tests_names': tests_names,
                                 'quizzes': quizzes
                                 }
                              )

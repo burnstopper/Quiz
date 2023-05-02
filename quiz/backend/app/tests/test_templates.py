@@ -3,6 +3,8 @@ import json
 from fastapi import status
 from httpx import AsyncClient
 
+from app.api.templates import get_test_names_by_id
+
 
 async def test_create_template(async_client: AsyncClient):
     # test creating a new template without name
@@ -13,17 +15,20 @@ async def test_create_template(async_client: AsyncClient):
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     # test creating a new template
+    tests_ids: list[int] = [1, 2, 3]
+    tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in tests_ids]
+
     response = await async_client.post(url='/api/templates/', json={
         'name': 'Template 1',
-        'tests_ids': [1, 2, 3]
+        'tests_ids': tests_ids
     })
 
     assert response.status_code == status.HTTP_201_CREATED
 
     assert response.json() == {
         'name': 'Template 1',
-        'tests_ids': [1, 2, 3],
-        'tests_names': None,
+        'tests_ids': tests_ids,
+        'tests_names': tests_names,
         'quizzes': None,
         'id': 1
     }
@@ -37,17 +42,20 @@ async def test_create_template(async_client: AsyncClient):
     assert response.status_code == status.HTTP_409_CONFLICT
 
     # test creating a new template
+    tests_ids: list[int] = [1, 2]
+    tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in tests_ids]
+
     response = await async_client.post(url='/api/templates/', json={
         'name': 'Template 2',
-        'tests_ids': [1, 2],
+        'tests_ids': tests_ids,
     })
 
     assert response.status_code == status.HTTP_201_CREATED
 
     assert response.json() == {
         'name': 'Template 2',
-        'tests_ids': [1, 2],
-        'tests_names': None,
+        'tests_ids': tests_ids,
+        'tests_names': tests_names,
         'quizzes': None,
         'id': 2
     }
@@ -55,17 +63,20 @@ async def test_create_template(async_client: AsyncClient):
 
 async def test_update_template(async_client: AsyncClient):
     # test updating the template by id
+    tests_ids: list[int] = [1, 2, 3]
+    tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in tests_ids]
+
     response = await async_client.put(url='/api/templates/1', json={
         'name': 'Updated Template 1',
-        'tests_ids': [2, 3]
+        'tests_ids': tests_ids
     })
 
     assert response.status_code == status.HTTP_200_OK
 
     assert response.json() == {
         'name': 'Updated Template 1',
-        'tests_ids': [2, 3],
-        'tests_names': None,
+        'tests_ids': tests_ids,
+        'tests_names': tests_names,
         'quizzes': None,
         'id': 1
     }
@@ -110,6 +121,13 @@ async def test_get_all_templates(async_client: AsyncClient):
         'id': 3
     }
 
+    updated_template_first_tests_ids: list[int] = [1, 2, 3]
+    updated_template_first_tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in
+                                                     updated_template_first_tests_ids]
+
+    template_second_tests_ids: list[int] = [1, 2]
+    template_second_tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in template_second_tests_ids]
+
     response = await async_client.get(url='/api/templates/')
 
     assert response.status_code == status.HTTP_200_OK
@@ -117,8 +135,8 @@ async def test_get_all_templates(async_client: AsyncClient):
     assert response.json() == [
         {
             'name': 'Updated Template 1',
-            'tests_ids': [2, 3],
-            'tests_names': None,
+            'tests_ids': updated_template_first_tests_ids,
+            'tests_names': updated_template_first_tests_names,
             'quizzes': [
                 {
                     'name': 'Updated Quiz 1',
@@ -132,8 +150,8 @@ async def test_get_all_templates(async_client: AsyncClient):
 
         {
             'name': 'Template 2',
-            'tests_ids': [1, 2],
-            'tests_names': None,
+            'tests_ids': template_second_tests_ids,
+            'tests_names': template_second_tests_names,
             'quizzes': [
                 {
                     'name': 'Quiz 2',
@@ -156,14 +174,18 @@ async def test_get_all_templates(async_client: AsyncClient):
 
 async def test_get_template_by_id(async_client: AsyncClient):
     # test getting the template by id
+    updated_template_first_tests_ids: list[int] = [1, 2, 3]
+    updated_template_first_tests_names: list[str] = [get_test_names_by_id(test_id=test) for test in
+                                                     updated_template_first_tests_ids]
+
     response = await async_client.get('/api/templates/1')
 
     assert response.status_code == status.HTTP_200_OK
 
     assert response.json() == {
         'name': 'Updated Template 1',
-        'tests_ids': [2, 3],
-        'tests_names': None,
+        'tests_ids': updated_template_first_tests_ids,
+        'tests_names': updated_template_first_tests_names,
         'quizzes': [
             {
                 'name': 'Updated Quiz 1',
