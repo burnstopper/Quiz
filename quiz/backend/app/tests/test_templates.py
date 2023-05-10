@@ -102,8 +102,8 @@ async def test_update_template(async_client: AsyncClient):
     assert json.loads(response.content)['detail'] == 'Template with this id does not exist'
 
     # test updating the template with the name that already exists
-    response = await async_client.put(url='/api/templates/2', json={
-        'name': ' Updated Template 1 ',
+    response = await async_client.put(url='/api/templates/1', json={
+        'name': ' Updated Template 2 ',
         'tests_ids': [1, 2]
     })
     assert response.status_code == status.HTTP_409_CONFLICT

@@ -80,7 +80,7 @@ async def test_update_quiz(async_client: AsyncClient):
     assert json.loads(response.content)['detail'] == 'Quiz with this id does not exist'
 
     # test updating the quiz with the name that already exists
-    response = await async_client.put(url='/api/quizzes/2', json={
+    response = await async_client.put(url='/api/quizzes/1', json={
         'name': 'Updated Quiz 2 ',
         'description': 'Test updating Quiz 2',
         'template_id': 2
