@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=RequestedQuiz)
-async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -> Quiz | None:
+async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -> Quiz:
     """
     Create a new quiz
     """
@@ -29,7 +29,7 @@ async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -
 
 
 @router.put('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)
-async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depends(get_db)) -> Quiz | None:
+async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depends(get_db)) -> Quiz:
     """
     Update the quiz by id
     """
@@ -48,7 +48,7 @@ async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depe
 
 
 @router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)
-async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Quiz | None:
+async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Quiz:
     """
     Get the quiz by id
     """

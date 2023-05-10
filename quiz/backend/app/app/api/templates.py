@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=RequestedTemplate)
-async def create_template(template_in: TemplateCreate, db: AsyncSession = Depends(get_db)) -> RequestedTemplate | None:
+async def create_template(template_in: TemplateCreate, db: AsyncSession = Depends(get_db)) -> RequestedTemplate:
     """
     Create a new template
     """
@@ -46,7 +46,7 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
 
 @router.put('/{template_id}', status_code=status.HTTP_200_OK, response_model=RequestedTemplate)
 async def update_template(template_id: int, template_in: TemplateUpdate,
-                          db: AsyncSession = Depends(get_db)) -> RequestedTemplate | None:
+                          db: AsyncSession = Depends(get_db)) -> RequestedTemplate:
     """
     Update the template by id
     """
@@ -78,7 +78,7 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
 
 
 @router.get('/{template_id}', status_code=status.HTTP_200_OK, response_model=RequestedTemplate)
-async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db)) -> RequestedTemplate | None:
+async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db)) -> RequestedTemplate:
     """
     Get the template by id
     """
