@@ -15,7 +15,7 @@ class QuizCreate(QuizBase):
     template_id: int = Field(ge=1)
 
 
-class Quiz(QuizBase):
+class Quiz(QuizCreate):
     id: int = Field(ge=1)
 
     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
@@ -25,4 +25,3 @@ class Quiz(QuizBase):
 
 class QuizUpdate(QuizCreate):
     pass
-
