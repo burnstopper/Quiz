@@ -8,16 +8,18 @@ from app.schemas.quiz import Quiz
 
 
 class TemplateBase(BaseModel):
-    name: str = Field(min_length=1)
+    pass
 
 
 class TemplateCreate(TemplateBase):
+    name: str = Field(min_length=1)
     tests_ids: list[int]
 
 
 class Template(TemplateCreate):
     id: int = Field(ge=1)
     tests_names: list[str] | None
+    tests_urls: list[str] | None
     quizzes: list[Quiz] | None
 
     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode

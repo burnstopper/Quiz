@@ -6,13 +6,13 @@ from pydantic import BaseModel, Field
 
 
 class QuizBase(BaseModel):
-    name: str = Field(min_length=1)
-    description: str
-    template_id: int = Field(ge=1)
+    pass
 
 
 class QuizCreate(QuizBase):
-    pass
+    name: str = Field(min_length=1)
+    description: str
+    template_id: int = Field(ge=1)
 
 
 class Quiz(QuizBase):
@@ -25,3 +25,4 @@ class Quiz(QuizBase):
 
 class QuizUpdate(QuizCreate):
     pass
+

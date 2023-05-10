@@ -6,4 +6,4 @@ from app.database.base_class import Base  # noqa
 from app.models.quiz import Quiz  # noqa
 from app.models.quiz_respondent import QuizRespondent  # noqa
 from app.models.template import Template  # noqa
-from app.models.template_tests import TemplateTests  # noqa
+from app.models.template_test import TemplateTest  # noqa

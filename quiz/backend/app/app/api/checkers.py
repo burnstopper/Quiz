@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.quiz import CRUDQuiz
 from app.crud.quiz_respondents import CRUDQuizRespondent
 from app.crud.template import CRUDTemplate
-
 from app.models.quiz import Quiz
 from app.models.quiz_respondent import QuizRespondent
 from app.models.template import Template
