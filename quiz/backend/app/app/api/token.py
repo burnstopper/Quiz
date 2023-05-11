@@ -42,10 +42,7 @@ async def get_respondent_id_by_token(respondent_token: str) -> JSONResponse:
                                      headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                     )
 
-        if response.status_code == status.HTTP_403_FORBIDDEN:
-            raise HTTPException(status_code=response.status_code, detail=json.loads(response.content)['detail'])
-
-        if response.status_code == status.HTTP_401_UNAUTHORIZED:
+        if response.status_code != status.HTTP_200_OK:
             raise HTTPException(status_code=response.status_code, detail=json.loads(response.content)['detail'])
 
         respondent_id = int(response.text)
