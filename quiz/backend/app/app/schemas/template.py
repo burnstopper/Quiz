@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 
 from app.schemas.quiz import Quiz
+from app.schemas.template_test import TemplateTest
 
 
 # https://fastapi.tiangolo.com/tutorial/sql-databases/#create-the-pydantic-models
@@ -8,18 +9,16 @@ from app.schemas.quiz import Quiz
 
 
 class TemplateBase(BaseModel):
-    pass
+    name: str = Field(min_length=1)
 
 
 class TemplateCreate(TemplateBase):
-    name: str = Field(min_length=1)
     tests_ids: list[int]
 
 
-class Template(TemplateCreate):
+class Template(TemplateBase):
     id: int = Field(ge=1)
-    tests_names: list[str] | None
-    tests_urls: list[str] | None
+    tests: list[TemplateTest] | None
     quizzes: list[Quiz] | None
 
     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
