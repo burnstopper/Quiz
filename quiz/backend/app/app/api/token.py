@@ -45,8 +45,7 @@ async def get_respondent_id_by_token(respondent_token: str) -> JSONResponse:
         if response.status_code != status.HTTP_200_OK:
             raise HTTPException(status_code=response.status_code, detail=json.loads(response.content)['detail'])
 
-        respondent_id = int(response.text)
-
+    respondent_id = int(response.text)
     return JSONResponse(status_code=status.HTTP_200_OK, content={'respondent_id': respondent_id})
 
 
