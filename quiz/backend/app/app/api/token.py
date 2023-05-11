@@ -60,9 +60,13 @@ async def check_is_researcher(user_token: str) -> JSONResponse:
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        is_researcher: bool = bool(await client.post(f'http://{settings.TOKEN_SERVICE_URL}'
-                                                     f'/api/check_researcher/{user_token}',
-                                                     headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
-                                   )
+        response = (await client.post(f'http://{settings.TOKEN_SERVICE_URL}'
+                                      f'/api/check_researcher/{user_token}',
+                                      headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
+                    )
 
+        if response.status_code != status.HTTP_200_OK:
+            raise HTTPException(status_code=response.status_code, detail=json.loads(response.content)['detail'])
+
+    is_researcher: bool = bool(response)
     return JSONResponse(status_code=status.HTTP_200_OK, content={'is_researcher': is_researcher})
