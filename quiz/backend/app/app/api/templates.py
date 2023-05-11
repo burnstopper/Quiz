@@ -3,18 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.checkers import check_is_name_unique, check_id_is_valid, check_conflicts_with_other_names
 from app.api.checkers import check_test_id_is_valid
-
 from app.core.config import settings
-
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.template import crud as crud_templates
 from app.crud.template_test import crud as crud_template_tests
-
 from app.database.dependencies import get_db
-
 from app.models.template import Template
 from app.models.template_test import TemplateTest
-
 from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
 from app.schemas.template_test import TemplateTest as Test
@@ -46,7 +41,9 @@ async def get_tests(template_id: int, db: AsyncSession) -> list[Test]:
 
 async def get_requested_template(template: Template, tests_ids: list[int] = None,
                                  db: AsyncSession = None) -> RequestedTemplate:
-    requested_template = {'name': template.name}
+    requested_template = {'id': template.id,
+                          'name': template.name
+                          }
 
     # db is None, when function is called from creat_template or update_template endpoint, because db is committed
     # In these cases we do not need quizzes of the template
