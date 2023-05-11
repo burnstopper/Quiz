@@ -1,8 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
+
 from app.crud.quiz import CRUDQuiz
 from app.crud.quiz_respondents import CRUDQuizRespondent
 from app.crud.template import CRUDTemplate
+
 from app.models.quiz import Quiz
 from app.models.quiz_respondent import QuizRespondent
 from app.models.template import Template
@@ -26,6 +29,10 @@ async def check_conflicts_with_other_names(crud: CRUDQuiz | CRUDTemplate, item_i
 async def check_id_is_valid(crud: CRUDQuiz | CRUDTemplate, item_id: int, db: AsyncSession) -> bool:
     max_id: int = await crud.get_last_id(db=db)
     return item_id <= max_id
+
+
+async def check_test_id_is_valid(tests_ids: list[int]) -> bool:
+    return all([0 < test_id <= settings.COUNT_TESTS_SERVICES for test_id in tests_ids])
 
 
 async def has_respondent_added_to_quiz(crud: CRUDQuizRespondent, quiz_id: int,
