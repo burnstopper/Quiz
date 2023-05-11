@@ -2,18 +2,61 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.checkers import check_is_name_unique, check_id_is_valid, check_conflicts_with_other_names
-from app.api.get_tests import get_tests, get_test_data
+from app.api.checkers import check_test_id_is_valid
+
+from app.core.config import settings
+
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.template import crud as crud_templates
 from app.crud.template_test import crud as crud_template_tests
+
 from app.database.dependencies import get_db
-from app.models.quiz import Quiz
+
 from app.models.template import Template
+from app.models.template_test import TemplateTest
+
 from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
-from app.schemas.template_test import TemplateTest
+from app.schemas.template_test import TemplateTest as Test
 
 router = APIRouter()
+
+
+def get_test_data(test_id: int) -> Test:
+    match test_id:
+        case 1:
+            return Test(**{'id': 1, 'name': settings.BURNOUT_SERVICE_NAME, 'url': settings.BURNOUT_SERVICE_URL})
+        case 2:
+            return Test(**{'id': 2, 'name': settings.FATIGUE_SERVICE_NAME, 'url': settings.FATIGUE_SERVICE_URL})
+        case 3:
+            return Test(**{'id': 3, 'name': settings.COPING_SERVICE_NAME, 'url': settings.COPING_SERVICE_URL})
+        case 4:
+            return Test(**{'id': 4, 'name': settings.SPB_SERVICE_NAME, 'url': settings.SPB_SERVICE_URL})
+
+
+async def get_tests(template_id: int, db: AsyncSession) -> list[Test]:
+    temp_tests: list[TemplateTest] = await crud_template_tests.get_template_tests(template_id=template_id, db=db)
+
+    tests: list[Test | None] = [None] * len(temp_tests)
+    for test in temp_tests:
+        tests[test.index] = get_test_data(test_id=test.test_id)
+
+    return tests
+
+
+async def get_requested_template(template: Template, tests_ids: list[int] = None,
+                                 db: AsyncSession = None) -> RequestedTemplate:
+    requested_template = {'name': template.name}
+
+    # db is None, when function is called from creat_template or update_template endpoint, because db is committed
+    # In these cases we do not need quizzes of the template
+    if db is None:
+        requested_template['tests'] = [get_test_data(test_id=test_id) for test_id in tests_ids]
+    else:
+        requested_template['quizzes'] = await crud_quizzes.get_quizzes_by_template_id(template_id=template.id, db=db)
+        requested_template['tests'] = await get_tests(template_id=template.id, db=db)
+
+    return RequestedTemplate(**requested_template)
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=RequestedTemplate)
@@ -27,21 +70,15 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Template with this name has already been created')
 
+    is_valid_tests_ids: bool = await check_test_id_is_valid(tests_ids=template_in.tests_ids)
+    if not is_valid_tests_ids:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Invalid test id')
+
     new_template: Template = await crud_templates.create_template(template_in=template_in, db=db)
-
     new_id: int = (await crud_templates.get_last_id(db=db)) + 1
-
     await crud_template_tests.add_tests_to_template(template_id=new_id, tests=template_in.tests_ids, db=db)
 
-    tests: list[TemplateTest] = [get_test_data(test_id=test_id) for test_id in template_in.tests_ids]
-
-    return RequestedTemplate(**{'id': new_id,
-                                'name': new_template.name,
-                                'tests_ids': template_in.tests_ids,
-                                'tests_names': [test.name for test in tests],
-                                'tests_urls': [test.url for test in tests]
-                                }
-                             )
+    return await get_requested_template(template=new_template, tests_ids=template_in.tests_ids)
 
 
 @router.put('/{template_id}', status_code=status.HTTP_200_OK, response_model=RequestedTemplate)
@@ -66,15 +103,7 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
 
     await crud_template_tests.update_template_tests(template_id=template_id, tests=template_in.tests_ids, db=db)
 
-    tests: list[TemplateTest] = [get_test_data(test_id=test_id) for test_id in template_in.tests_ids]
-
-    return RequestedTemplate(**{'id': updated_template.id,
-                                'name': updated_template.name,
-                                'tests_ids': template_in.tests_ids,
-                                'tests_names': [test.name for test in tests],
-                                'tests_urls': [test.url for test in tests]
-                                }
-                             )
+    return await get_requested_template(template=updated_template, tests_ids=template_in.tests_ids)
 
 
 @router.get('/{template_id}', status_code=status.HTTP_200_OK, response_model=RequestedTemplate)
@@ -89,17 +118,7 @@ async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db
 
     template: Template = await crud_templates.get_template_by_id(template_id=template_id, db=db)
 
-    quizzes: list[Quiz] = await crud_quizzes.get_quizzes_by_template_id(template_id=template_id, db=db)
-
-    tests: list[TemplateTest] = await get_tests(template_id=template_id, db=db)
-
-    return RequestedTemplate(**{'id': template_id,
-                                'name': template.name,
-                                'tests_ids': [test.id for test in tests],
-                                'tests_names': [test.name for test in tests],
-                                'tests_urls': [test.url for test in tests],
-                                'quizzes': quizzes
-                                })
+    return await get_requested_template(template=template, db=db)
 
 
 @router.get('/', status_code=status.HTTP_200_OK, response_model=list[RequestedTemplate])
@@ -109,7 +128,6 @@ async def get_all_templates(db: AsyncSession = Depends(get_db)) -> list[Requeste
     """
 
     templates: list[Template] = await crud_templates.get_all_templates(db=db)
-
     results: list[RequestedTemplate | None] = [None] * len(templates)
 
     for i in range(len(templates)):
