@@ -31,7 +31,7 @@ async def check_id_is_valid(crud: CRUDQuiz | CRUDTemplate, item_id: int, db: Asy
     return item_id <= max_id
 
 
-async def check_test_id_is_valid(tests_ids: list[int]) -> bool:
+def check_test_id_is_valid(tests_ids: list[int]) -> bool:
     return all([0 < test_id <= settings.COUNT_TESTS_SERVICES for test_id in tests_ids])
 
 
