@@ -1,1 +1,3 @@
-# Quiz
+# Microservice «Quiz»
+
+Микросервис «Опросы»
