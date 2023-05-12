@@ -67,7 +67,7 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Template with this name has already been created')
 
-    is_valid_tests_ids: bool = await check_test_id_is_valid(tests_ids=template_in.tests_ids)
+    is_valid_tests_ids: bool = check_test_id_is_valid(tests_ids=template_in.tests_ids)
     if not is_valid_tests_ids:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Invalid test id')
 
