@@ -19,11 +19,15 @@ async def create_new_respondent() -> JSONResponse:
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        respondent_token = (await client.post(f'http://{settings.TOKEN_SERVICE_URL}'
-                                              f'/api/user/new_respondent',
-                                              headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
-                            ).text
+        response = (await client.post(url=f'http://{settings.TOKEN_SERVICE_URL}'
+                                          f'/api/user/new_respondent',
+                                      headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
+                    )
 
+        if response.status_code != status.HTTP_201_CREATED:
+            raise HTTPException(status_code=response.status_code, detail='Something wrong. Try again')
+
+    respondent_token: str = str(response.text)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content={'respondent_token': respondent_token})
 
 
@@ -37,8 +41,8 @@ async def get_respondent_id_by_token(respondent_token: str) -> JSONResponse:
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        response = (await client.get(f'http://{settings.TOKEN_SERVICE_URL}'
-                                     f'/api/user/{respondent_token}',
+        response = (await client.get(url=f'http://{settings.TOKEN_SERVICE_URL}'
+                                         f'/api/user/{respondent_token}',
                                      headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                     )
 
@@ -59,8 +63,8 @@ async def check_is_researcher(user_token: str) -> JSONResponse:
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        response = (await client.post(f'http://{settings.TOKEN_SERVICE_URL}'
-                                      f'/api/check_researcher/{user_token}',
+        response = (await client.post(url=f'http://{settings.TOKEN_SERVICE_URL}'
+                                          f'/api/check_researcher/{user_token}',
                                       headers={'Authorization': f'Bearer {settings.BEARER_TOKEN}'})
                     )
 
