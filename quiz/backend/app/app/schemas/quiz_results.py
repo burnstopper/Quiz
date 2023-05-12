@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from app.schemas.template_test import TemplateTestResults
+
 
 class QuizResultsBase(BaseModel):
     pass
@@ -7,4 +9,4 @@ class QuizResultsBase(BaseModel):
 
 class QuizResults(QuizResultsBase):
     quiz_id: int = Field(ge=1)
-    results: list[dict[str, int]]
+    tests_results: list[TemplateTestResults]
