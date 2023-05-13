@@ -4,35 +4,21 @@ import httpx
 from fastapi import APIRouter, Depends, status, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.checkers import check_id_is_valid
 from app.api.templates import get_tests
-
 from app.core.config import settings
-
+from app.crud.base import check_item_id_is_valid
 from app.crud.quiz import crud as crud_quizzes
 from app.database.dependencies import get_db
-
 from app.schemas.quiz_results import QuizResults
-from app.schemas.template_test import TemplateTest, TemplateTestResults
+from app.schemas.template_test import TemplateTest
+from app.utils.parse_results import parse_results_json
 
 router = APIRouter()
 
 
-def parse_results_json(results_json: dict) -> list[TemplateTestResults]:
-    keys: list[str] = list(results_json.keys())
-
-    results: list[TemplateTestResults | None] = [None] * len(keys)
-    for i in range(len(keys)):
-        test = {'id': int(keys[i][-1]),
-                'results': results_json[keys[i]]
-                }
-
-        results[i] = TemplateTestResults(**test)
-    return results
-
-
+@router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=QuizResults)
 async def get_quiz_results(quiz_id: int, db: AsyncSession, respondent_id: int = None) -> QuizResults:
-    is_valid: bool = await check_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
+    is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
 

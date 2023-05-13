@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.template_test import TemplateTest
 
 
-class CRUDTemplateTest:
+class CRUDTemplateTests:
     def __init__(self, model: Type[TemplateTest]):
         self.model = model
 
@@ -39,4 +39,4 @@ class CRUDTemplateTest:
         return list((await db.execute(query)).scalars().all())
 
 
-crud = CRUDTemplateTest(TemplateTest)
+crud = CRUDTemplateTests(TemplateTest)

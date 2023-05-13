@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.quiz_respondent import QuizRespondent
 
 
-class CRUDQuizRespondent:
+class CRUDQuizRespondents:
     def __init__(self, model: Type[QuizRespondent]):
         self.model = model
 
@@ -34,4 +34,15 @@ class CRUDQuizRespondent:
         return list((await db.execute(query)).scalars().all())
 
 
-crud = CRUDQuizRespondent(QuizRespondent)
+async def has_respondent_added_to_quiz(crud_quiz_respondents: CRUDQuizRespondents, quiz_id: int,
+                                       respondent_id: int, db: AsyncSession) -> bool:
+    quiz_respondent: QuizRespondent = await crud_quiz_respondents.select_respondent_quiz(quiz_id=quiz_id,
+                                                                                         respondent_id=respondent_id,
+                                                                                         db=db)
+
+    if quiz_respondent is None:
+        return False
+    return True
+
+
+crud = CRUDQuizRespondents(QuizRespondent)

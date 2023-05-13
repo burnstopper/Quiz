@@ -1,32 +1,19 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.checkers import check_is_name_unique, check_id_is_valid, check_conflicts_with_other_names
-from app.api.checkers import check_test_id_is_valid
-from app.core.config import settings
+from app.crud.base import check_is_name_unique, check_item_id_is_valid, check_conflicts_with_other_names
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.template import crud as crud_templates
-from app.crud.template_test import crud as crud_template_tests
+from app.crud.template_tests import crud as crud_template_tests
 from app.database.dependencies import get_db
 from app.models.template import Template
 from app.models.template_test import TemplateTest
 from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
 from app.schemas.template_test import TemplateTest as Test
+from app.utils.test_data import check_test_id_is_valid, get_test_data
 
 router = APIRouter()
-
-
-def get_test_data(test_id: int) -> Test:
-    match test_id:
-        case 1:
-            return Test(**{'id': 1, 'name': settings.BURNOUT_SERVICE_NAME, 'url': settings.BURNOUT_SERVICE_URL})
-        case 2:
-            return Test(**{'id': 2, 'name': settings.FATIGUE_SERVICE_NAME, 'url': settings.FATIGUE_SERVICE_URL})
-        case 3:
-            return Test(**{'id': 3, 'name': settings.COPING_SERVICE_NAME, 'url': settings.COPING_SERVICE_URL})
-        case 4:
-            return Test(**{'id': 4, 'name': settings.SPB_SERVICE_NAME, 'url': settings.SPB_SERVICE_URL})
 
 
 async def get_tests(template_id: int, db: AsyncSession) -> list[Test]:
@@ -85,7 +72,7 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
     Update the template by id
     """
 
-    is_valid: bool = await check_id_is_valid(crud=crud_templates, item_id=template_id, db=db)
+    is_valid: bool = await check_item_id_is_valid(crud=crud_templates, item_id=template_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id does not exist')
 
@@ -109,7 +96,7 @@ async def get_template_by_id(template_id: int, db: AsyncSession = Depends(get_db
     Get the template by id
     """
 
-    is_valid: bool = await check_id_is_valid(crud=crud_templates, item_id=template_id, db=db)
+    is_valid: bool = await check_item_id_is_valid(crud=crud_templates, item_id=template_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id does not exist')
 

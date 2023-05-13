@@ -2,15 +2,13 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.checkers import check_conflicts_with_other_names
-from app.api.checkers import check_id_is_valid, check_is_name_unique, has_respondent_added_to_quiz
-
+from app.crud.base import check_conflicts_with_other_names
+from app.crud.base import check_item_id_is_valid, check_is_name_unique
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
-
+from app.crud.quiz_respondents import has_respondent_added_to_quiz
 from app.database.dependencies import get_db
 from app.models.quiz import Quiz
-
 from app.schemas.quiz import Quiz as RequestedQuiz
 from app.schemas.quiz import QuizCreate, QuizUpdate
 
@@ -37,7 +35,7 @@ async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depe
     Update the quiz by id
     """
 
-    is_valid: bool = await check_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
+    is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
 
@@ -56,7 +54,7 @@ async def get_quiz_by_id(quiz_id: int, db: AsyncSession = Depends(get_db)) -> Qu
     Get the quiz by id
     """
 
-    is_valid: bool = await check_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
+    is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
 
@@ -87,7 +85,7 @@ async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession 
     Check has the respondent access to quiz
     """
 
-    has_access: bool = await has_respondent_added_to_quiz(crud=crud_quiz_respondents,
+    has_access: bool = await has_respondent_added_to_quiz(crud_quiz_respondents=crud_quiz_respondents,
                                                           quiz_id=quiz_id,
                                                           respondent_id=respondent_id,
                                                           db=db)
