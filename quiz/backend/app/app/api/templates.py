@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud.base import check_is_name_unique, check_item_id_is_valid, check_conflicts_with_other_names
+from app.crud.checkers import check_is_name_unique, check_item_id_is_valid, check_conflicts_with_other_names
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.template import crud as crud_templates
 from app.crud.template_tests import crud as crud_template_tests

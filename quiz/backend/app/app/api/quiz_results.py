@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.templates import get_tests
 from app.core.config import settings
-from app.crud.base import check_item_id_is_valid
+from app.crud.checkers import check_item_id_is_valid
 from app.crud.quiz import crud as crud_quizzes
 from app.database.dependencies import get_db
 from app.schemas.quiz_results import QuizResults
@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=QuizResults)
-async def get_quiz_results(quiz_id: int, db: AsyncSession, respondent_id: int = None) -> QuizResults:
+async def get_quiz_results(quiz_id: int, db: AsyncSession = Depends(get_db), respondent_id: int = None) -> QuizResults:
     is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
@@ -51,6 +51,6 @@ async def get_quizzes_results(quizzes_ids: Annotated[list[int], Query()], respon
                               db: AsyncSession = Depends(get_db)) -> list[QuizResults]:
     results: list[QuizResults | None] = [None] * len(quizzes_ids)
     for i in range(len(quizzes_ids)):
-        results[i] = await get_quiz_results(quiz_id=quizzes_ids[i], respondent_id=respondent_id, db=db)
+        results[i] = await get_quiz_results(quiz_id=quizzes_ids[i], db=db, respondent_id=respondent_id)
 
     return results

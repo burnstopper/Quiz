@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.token import get_respondent_id_by_token
-from app.crud.base import check_item_id_is_valid
+from app.crud.checkers import check_item_id_is_valid
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
 from app.crud.quiz_respondents import has_respondent_added_to_quiz
