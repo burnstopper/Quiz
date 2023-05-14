@@ -8,7 +8,8 @@ from app.models.template import Template
 from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
 from app.utils.validators import check_is_name_unique, check_item_id_is_valid, check_conflicts_with_other_names
-from app.utils.test_data import check_test_id_is_valid, get_requested_template
+from app.utils.test_data import check_test_id_is_valid
+from app.utils.convert_template import get_requested_template
 
 router = APIRouter()
 
