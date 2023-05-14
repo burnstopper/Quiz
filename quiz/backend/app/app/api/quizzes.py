@@ -71,11 +71,11 @@ async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_
     if respondent_id is None:
         return await crud_quizzes.get_all_quizzes(db=db)
 
-    quizzes_ids: list[int] = await crud_quiz_respondents.get_respondent_quizzes(respondent_id=respondent_id, db=db)
+    respondent_quizzes_ids: list[int] = await crud_quiz_respondents.get_respondent_quizzes(respondent_id=respondent_id, db=db)
 
-    quizzes: list[Quiz | None] = [None] * len(quizzes_ids)
-    for i in range(len(quizzes_ids)):
-        quizzes[i] = await crud_quizzes.get_quiz_by_id(quiz_id=quizzes_ids[i], db=db)
+    quizzes: list[Quiz | None] = [None] * len(respondent_quizzes_ids)
+    for i in range(len(respondent_quizzes_ids)):
+        quizzes[i] = await crud_quizzes.get_quiz_by_id(quiz_id=respondent_quizzes_ids[i], db=db)
 
     return quizzes
 

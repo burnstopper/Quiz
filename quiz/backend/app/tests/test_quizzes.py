@@ -179,8 +179,11 @@ async def test_has_access_to_quiz(async_client: AsyncClient):
     assert response.status_code == status.HTTP_200_OK
     assert json.loads(response.content)['has_access']
 
+    # test getting respondent quizzes
+    response = await async_client.get(url='/api/quizzes/', params={'respondent_id': respondent_id})
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == [quiz_1]
+
     response = await async_client.get(url='/api/quizzes/1/check_access', params={'respondent_id': 123})
     assert response.status_code == status.HTTP_200_OK
     assert not json.loads(response.content)['has_access']
-
-
