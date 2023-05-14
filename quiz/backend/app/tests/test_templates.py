@@ -4,6 +4,7 @@ from fastapi import status
 from httpx import AsyncClient
 
 from app.core.config import settings
+from tests.test_quizzes import quiz_1, quiz_2, quiz_3
 
 created_template_1 = {
     'name': 'Created Template 1',
@@ -108,12 +109,7 @@ template_1 = {
         }
     ],
     'quizzes': [
-        {
-            'name': 'Updated Quiz 1',
-            'description': 'Test updating Quiz 1',
-            'template_id': 1,
-            'id': 1
-        }
+        quiz_1
     ]
 }
 
@@ -133,19 +129,8 @@ template_2 = {
         }
     ],
     'quizzes': [
-        {
-            'name': 'Updated Quiz 2',
-            'description': 'Test updating Quiz 2',
-            'template_id': 2,
-            'id': 2
-        },
-
-        {
-            'name': 'Created Quiz 3',
-            'description': 'Test creating Quiz 3',
-            'template_id': 2,
-            'id': 3
-        }
+        quiz_2,
+        quiz_3
     ]
 }
 
@@ -213,33 +198,18 @@ async def test_update_template(async_client: AsyncClient):
 
 async def test_get_template_by_id(async_client: AsyncClient):
     # test getting the template by id
-    response = await async_client.get('/api/templates/1')
+    response = await async_client.get(url='/api/templates/1')
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == template_1
 
     # test getting the template by invalid id
-    response = await async_client.get('/api/templates/3')
+    response = await async_client.get(url='/api/templates/3')
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert json.loads(response.content)['detail'] == 'Template with this id does not exist'
 
 
 async def test_get_all_templates(async_client: AsyncClient):
     # test getting all template with corresponding quizzes
-
-    # create a new quiz
-    response = await async_client.post(url='/api/quizzes/', json={
-        'name': 'Created Quiz 3',
-        'description': 'Test creating Quiz 3',
-        'template_id': 2,
-    })
-    assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == {
-        'name': 'Created Quiz 3',
-        'description': 'Test creating Quiz 3',
-        'template_id': 2,
-        'id': 3
-    }
-
     response = await async_client.get(url='/api/templates/')
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == [template_1, template_2]

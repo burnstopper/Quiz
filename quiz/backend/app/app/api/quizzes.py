@@ -4,13 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
-from app.crud.quiz_respondents import has_respondent_added_to_quiz
 from app.database.dependencies import get_db
 from app.models.quiz import Quiz
 from app.schemas.quiz import Quiz as RequestedQuiz
 from app.schemas.quiz import QuizCreate, QuizUpdate
 from app.utils.validators import check_conflicts_with_other_names
 from app.utils.validators import check_item_id_is_valid, check_is_name_unique
+from app.utils.validators import has_respondent_added_to_quiz
 
 router = APIRouter()
 
@@ -80,14 +80,13 @@ async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_
     return quizzes
 
 
-@router.get('/{quiz_id}/respondent/{respondent_id}')
+@router.get('/{quiz_id}/check_access')
 async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
     Check has the respondent access to quiz
     """
 
-    has_access: bool = await has_respondent_added_to_quiz(crud_quiz_respondents=crud_quiz_respondents,
-                                                          quiz_id=quiz_id,
+    has_access: bool = await has_respondent_added_to_quiz(quiz_id=quiz_id,
                                                           respondent_id=respondent_id,
                                                           db=db)
 

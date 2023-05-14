@@ -34,15 +34,4 @@ class CRUDQuizRespondents:
         return list((await db.execute(query)).scalars().all())
 
 
-async def has_respondent_added_to_quiz(crud_quiz_respondents: CRUDQuizRespondents, quiz_id: int,
-                                       respondent_id: int, db: AsyncSession) -> bool:
-    quiz_respondent: QuizRespondent = await crud_quiz_respondents.select_respondent_quiz(quiz_id=quiz_id,
-                                                                                         respondent_id=respondent_id,
-                                                                                         db=db)
-
-    if quiz_respondent is None:
-        return False
-    return True
-
-
 crud = CRUDQuizRespondents(QuizRespondent)
