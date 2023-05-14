@@ -1,5 +1,13 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.config import settings
+from app.crud.quiz import crud as crud_quizzes
+from app.crud.template_tests import crud as crud_template_tests
+from app.models.template import Template
+from app.models.template_test import TemplateTest
+from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template_test import TemplateTest
+from app.schemas.template_test import TemplateTest as Test
 
 
 def check_test_id_is_valid(tests_ids: list[int]) -> bool:
@@ -16,3 +24,14 @@ def get_test_data(test_id: int) -> TemplateTest:
             return TemplateTest(**{'id': 3, 'name': settings.COPING_SERVICE_NAME, 'url': settings.COPING_SERVICE_URL})
         case 4:
             return TemplateTest(**{'id': 4, 'name': settings.SPB_SERVICE_NAME, 'url': settings.SPB_SERVICE_URL})
+
+
+async def get_tests(template_id: int, db: AsyncSession) -> list[Test]:
+    temp_tests: list[TemplateTest] = await crud_template_tests.get_template_tests(template_id=template_id, db=db)
+
+    tests: list[Test | None] = [None] * len(temp_tests)
+    for test in temp_tests:
+        tests[test.index] = get_test_data(test_id=test.test_id)
+
+    return tests
+

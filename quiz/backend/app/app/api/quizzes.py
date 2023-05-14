@@ -2,8 +2,6 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.utils.checkers import check_conflicts_with_other_names
-from app.utils.checkers import check_item_id_is_valid, check_is_name_unique
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
 from app.crud.quiz_respondents import has_respondent_added_to_quiz
@@ -11,6 +9,8 @@ from app.database.dependencies import get_db
 from app.models.quiz import Quiz
 from app.schemas.quiz import Quiz as RequestedQuiz
 from app.schemas.quiz import QuizCreate, QuizUpdate
+from app.utils.validators import check_conflicts_with_other_names
+from app.utils.validators import check_item_id_is_valid, check_is_name_unique
 
 router = APIRouter()
 
@@ -26,7 +26,8 @@ async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Quiz with this name has already been created')
 
-    return await crud_quizzes.create_new_quiz(quiz_in=quiz_in, db=db)
+    new_id: int = (await crud_quizzes.get_last_id(db=db)) + 1
+    return await crud_quizzes.create_new_quiz(quiz_in=quiz_in, new_id=new_id, db=db)
 
 
 @router.put('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=RequestedQuiz)

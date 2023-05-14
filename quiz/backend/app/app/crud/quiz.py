@@ -7,10 +7,11 @@ from app.schemas.quiz import QuizCreate, QuizUpdate
 
 
 class CRUDQuiz(CRUDBase[Quiz]):
-    async def create_new_quiz(self, quiz_in: QuizCreate, db: AsyncSession) -> Quiz:
+    async def create_new_quiz(self, quiz_in: QuizCreate, new_id: int, db: AsyncSession) -> Quiz:
         new_quiz = Quiz(name=quiz_in.name.strip(),
                         template_id=quiz_in.template_id,
-                        description=quiz_in.description
+                        description=quiz_in.description,
+                        invite_link=f'/invite/quizzes/{new_id}/add'
                         )
         db.add(new_quiz)
         await db.commit()

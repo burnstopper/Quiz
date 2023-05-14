@@ -17,6 +17,7 @@ class QuizCreate(QuizBase):
 
 class Quiz(QuizCreate):
     id: int = Field(ge=1)
+    invite_link: str = Field(regex=r'/invite/quizzes/\d/add')
 
     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
     class Config:

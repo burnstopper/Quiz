@@ -1,46 +1,16 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.utils.checkers import check_is_name_unique, check_item_id_is_valid, check_conflicts_with_other_names
-from app.crud.quiz import crud as crud_quizzes
 from app.crud.template import crud as crud_templates
 from app.crud.template_tests import crud as crud_template_tests
 from app.database.dependencies import get_db
 from app.models.template import Template
-from app.models.template_test import TemplateTest
 from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
-from app.schemas.template_test import TemplateTest as Test
-from app.utils.test_data import check_test_id_is_valid, get_test_data
+from app.utils.validators import check_is_name_unique, check_item_id_is_valid, check_conflicts_with_other_names
+from app.utils.test_data import check_test_id_is_valid, get_requested_template
 
 router = APIRouter()
-
-
-async def get_tests(template_id: int, db: AsyncSession) -> list[Test]:
-    temp_tests: list[TemplateTest] = await crud_template_tests.get_template_tests(template_id=template_id, db=db)
-
-    tests: list[Test | None] = [None] * len(temp_tests)
-    for test in temp_tests:
-        tests[test.index] = get_test_data(test_id=test.test_id)
-
-    return tests
-
-
-async def get_requested_template(template: Template, tests_ids: list[int] = None,
-                                 db: AsyncSession = None) -> RequestedTemplate:
-    requested_template = {'id': template.id,
-                          'name': template.name
-                          }
-
-    # db is None, when function is called from creat_template or update_template endpoint, because db is committed
-    # In these cases we do not need quizzes of the template
-    if db is None:
-        requested_template['tests'] = [get_test_data(test_id=test_id) for test_id in tests_ids]
-    else:
-        requested_template['quizzes'] = await crud_quizzes.get_quizzes_by_template_id(template_id=template.id, db=db)
-        requested_template['tests'] = await get_tests(template_id=template.id, db=db)
-
-    return RequestedTemplate(**requested_template)
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=RequestedTemplate)

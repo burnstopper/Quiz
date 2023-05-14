@@ -10,6 +10,7 @@ class Quiz(Base):
     name = Column(String, nullable=False, unique=True)
     template_id = Column(Integer, nullable=False)
     description = Column(String, nullable=False)
+    invite_link = Column(String, nullable=False, unique=True)
 
     def __repr__(self) -> str:
         return f'(Quiz)(id: {self.id}, template_id: {self.template_id}, name: {self.name})'
