@@ -29,7 +29,7 @@ async def get_quiz_result_status(quiz_id: int, respondent_id: int = None,
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
-        response = await client.get(url=f'http://{settings.TEST_SERVICE_URL}/api/gateway/v1/results/exits',
+        response = await client.get(url=f'http://{settings.TEST_SERVICE_URL}/api/gateway/v1/results/exists',
                                     params=await get_params(quiz_id=quiz_id, respondent_id=respondent_id, db=db),
                                     headers={'Authorization': f'Bearer {settings.TEST_SERVICES_BEARER_TOKEN}'}
                                     )
