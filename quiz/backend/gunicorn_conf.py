@@ -3,19 +3,14 @@
 import json
 import multiprocessing
 import os
-from dotenv import load_dotenv
+from app.core.config import settings
 
-load_dotenv()
-workers_per_core_str = os.getenv("WORKERS_PER_CORE", "1")
-web_concurrency_str = os.getenv("WEB_CONCURRENCY", None)
-host = os.getenv("HOST", "0.0.0.0")
-port = os.getenv("PORT", "8003")
-bind_env = os.getenv("BIND", None)
-use_loglevel = os.getenv("LOG_LEVEL", "info")
-if bind_env:
-    use_bind = bind_env
-else:
-    use_bind = f"{host}:{port}"
+workers_per_core_str = settings.WORKERS_PER_CORE
+web_concurrency_str = settings.WEB_CONCURRENCY
+host = "0.0.0.0"
+port = settings.PORT
+use_loglevel = settings.LOG_LEVEL
+use_bind = f"{host}:{port}"
 
 cores = multiprocessing.cpu_count()
 workers_per_core = float(workers_per_core_str)
@@ -32,15 +27,3 @@ workers = web_concurrency
 bind = use_bind
 keepalive = 120
 errorlog = "-"
-
-# For debugging and testing
-log_data = {
-    "loglevel": loglevel,
-    "workers": workers,
-    "bind": bind,
-    # Additional, non-gunicorn variables
-    "workers_per_core": workers_per_core,
-    "host": host,
-    "port": port,
-}
-print(json.dumps(log_data))
