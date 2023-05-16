@@ -5,6 +5,9 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     # url naming: https://docs.sqlalchemy.org/en/20/core/engines.html#sqlite
+    
+    WORKERS_PER_CORE: int = 1
+    WEB_CONCURRENCY: str | None
     SQLALCHEMY_DATABASE_URL: str
     BEARER_TOKEN: str
     COUNT_TESTS_SERVICES: int
