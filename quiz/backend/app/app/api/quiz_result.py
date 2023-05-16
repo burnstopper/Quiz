@@ -20,6 +20,7 @@ async def get_quiz_result_status(quiz_id: int, respondent_id: int = None,
     """
     Get result status of quiz by id
     """
+
     is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
@@ -41,6 +42,7 @@ async def get_quiz_result(quiz_id: int, respondent_id: int = None, db: AsyncSess
     """
     Get result of quiz by id
     """
+
     is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
@@ -64,6 +66,7 @@ async def get_quizzes_result_status(quizzes_ids: Annotated[list[int], Query()], 
     """
     Get result status of quizzes
     """
+
     result_status: list[QuizResultStatus | None] = [None] * len(quizzes_ids)
     for i in range(len(quizzes_ids)):
         result_status[i] = await get_quiz_result_status(quiz_id=quizzes_ids[i], respondent_id=respondent_id, db=db)
@@ -76,6 +79,7 @@ async def get_quizzes_result(quizzes_ids: Annotated[list[int], Query()], respond
     """
     Get result of quizzes
     """
+
     result: list[QuizResult | None] = [None] * len(quizzes_ids)
     for i in range(len(quizzes_ids)):
         result[i] = await get_quiz_result(quiz_id=quizzes_ids[i], respondent_id=respondent_id, db=db)
