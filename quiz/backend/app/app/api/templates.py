@@ -3,8 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.template import crud as crud_templates
 from app.crud.template_tests import crud as crud_template_tests
+from app.crud.quiz import crud as crud_quizzes
 from app.database.dependencies import get_db
 from app.models.template import Template
+from app.models.quiz import Quiz
 from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template import TemplateCreate, TemplateUpdate
 from app.utils.validators import check_is_name_unique, check_item_id_is_valid, check_conflicts_with_other_names
@@ -46,6 +48,10 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
     is_valid: bool = await check_item_id_is_valid(crud=crud_templates, item_id=template_id, db=db)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id does not exist')
+
+    quizzes: list[Quiz] = await crud_quizzes.get_quizzes_by_template_id(template_id=template_id, db=db)
+    if quizzes is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='This template already has quizzes')
 
     is_unique: bool = await check_conflicts_with_other_names(crud=crud_templates, item_id=template_id,
                                                              item_name=template_in.name, db=db)
