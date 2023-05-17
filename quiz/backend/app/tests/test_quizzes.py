@@ -22,7 +22,7 @@ created_quiz_2 = {
 updated_quiz_1 = {
     'name': 'Updated Quiz 1',
     'description': 'Test updating Quiz 1',
-    'template_id': 1,
+    'template_id': 3,
     'invite_link': '/invite/quizzes/1/add',
     'id': 1
 }
@@ -87,7 +87,7 @@ async def test_update_quiz(async_client: AsyncClient):
     response = await async_client.put(url='/api/quizzes/1', json={
         'name': 'Updated Quiz 1',
         'description': 'Test updating Quiz 1',
-        'template_id': 1
+        'template_id': 3
     })
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == updated_quiz_1

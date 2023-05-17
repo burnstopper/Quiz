@@ -50,7 +50,7 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id does not exist')
 
     quizzes: list[Quiz] = await crud_quizzes.get_quizzes_by_template_id(template_id=template_id, db=db)
-    if quizzes is not None:
+    if len(quizzes) != 0:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='This template already has quizzes')
 
     is_unique: bool = await check_conflicts_with_other_names(crud=crud_templates, item_id=template_id,

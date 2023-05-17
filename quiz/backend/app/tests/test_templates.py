@@ -2,8 +2,11 @@ import json
 
 from fastapi import status
 from httpx import AsyncClient
+from sqlalchemy import select
 
 from app.core.config import settings
+from app.models.quiz import Quiz
+from tests.conftest import async_session_maker
 from tests.test_quizzes import quiz_1, quiz_2, quiz_3
 
 created_template_1 = {
@@ -47,6 +50,24 @@ created_template_2 = {
     'quizzes': None
 }
 
+created_template_3 = {
+    'name': 'Created Template 3',
+    'id': 3,
+    'tests': [
+        {
+            'id': 4,
+            'name': settings.SPB_SERVICE_NAME,
+            'url': settings.SPB_SERVICE_URL
+        },
+        {
+            'id': 1,
+            'name': settings.BURNOUT_SERVICE_NAME,
+            'url': settings.BURNOUT_SERVICE_URL
+        }
+    ],
+    'quizzes': None
+}
+
 updated_template_1 = {
     'name': 'Updated Template 1',
     'id': 1,
@@ -65,24 +86,6 @@ updated_template_1 = {
             'id': 3,
             'name': settings.COPING_SERVICE_NAME,
             'url': settings.COPING_SERVICE_URL
-        }
-    ],
-    'quizzes': None
-}
-
-updated_template_2 = {
-    'name': 'Updated Template 2',
-    'id': 2,
-    'tests': [
-        {
-            'id': 4,
-            'name': settings.SPB_SERVICE_NAME,
-            'url': settings.SPB_SERVICE_URL
-        },
-        {
-            'id': 1,
-            'name': settings.BURNOUT_SERVICE_NAME,
-            'url': settings.BURNOUT_SERVICE_URL
         }
     ],
     'quizzes': None
@@ -108,31 +111,12 @@ template_1 = {
             'url': settings.COPING_SERVICE_URL
         }
     ],
-    'quizzes': [
-        quiz_1
-    ]
+    'quizzes': []
 }
 
-template_2 = {
-    'name': 'Updated Template 2',
-    'id': 2,
-    'tests': [
-        {
-            'id': 4,
-            'name': settings.SPB_SERVICE_NAME,
-            'url': settings.SPB_SERVICE_URL
-        },
-        {
-            'id': 1,
-            'name': settings.BURNOUT_SERVICE_NAME,
-            'url': settings.BURNOUT_SERVICE_URL
-        }
-    ],
-    'quizzes': [
-        quiz_2,
-        quiz_3
-    ]
-}
+template_2 = created_template_2
+template_3 = created_template_3
+template_3['quizzes'] = [quiz_3]
 
 
 async def test_create_template(async_client: AsyncClient):
@@ -160,6 +144,14 @@ async def test_create_template(async_client: AsyncClient):
     })
     assert response.status_code == status.HTTP_409_CONFLICT
 
+    tests_ids = [4, 1]
+    response = await async_client.post(url='/api/templates/', json={
+        'name': 'Created Template 3',
+        'tests_ids': tests_ids
+    })
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.json() == created_template_3
+
 
 async def test_update_template(async_client: AsyncClient):
     # test updating the template by id
@@ -171,16 +163,17 @@ async def test_update_template(async_client: AsyncClient):
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == updated_template_1
 
+    # tes updating the template that has quizzes
     updated_second_template_tests_ids = [4, 1]
     response = await async_client.put(url='/api/templates/2', json={
         'name': 'Updated Template 2',
         'tests_ids': updated_second_template_tests_ids
     })
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json() == updated_template_2
+    assert response.status_code != status.HTTP_409_CONFLICT
+    assert json.loads(response.content)['detail'] == 'This template already has quizzes'
 
     # test updating the quiz by invalid id
-    response = await async_client.put(url='/api/templates/3', json={
+    response = await async_client.put(url='/api/templates/4', json={
         'name': 'Test updating by invalid id',
         'tests_ids': [1, 2, 3]
     })
@@ -203,7 +196,7 @@ async def test_get_template_by_id(async_client: AsyncClient):
     assert response.json() == template_1
 
     # test getting the template by invalid id
-    response = await async_client.get(url='/api/templates/3')
+    response = await async_client.get(url='/api/templates/4')
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert json.loads(response.content)['detail'] == 'Template with this id does not exist'
 

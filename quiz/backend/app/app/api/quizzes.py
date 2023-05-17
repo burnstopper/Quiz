@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
+from app.crud.template import crud as crud_templates
 from app.database.dependencies import get_db
 from app.models.quiz import Quiz
 from app.schemas.quiz import Quiz as RequestedQuiz
@@ -20,6 +21,9 @@ async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -
     """
     Create a new quiz
     """
+    is_valid: bool = await check_item_id_is_valid(crud=crud_templates, item_id=quiz_in.template_id, db=db)
+    if not is_valid:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Template with this id does not exist')
 
     is_unique: bool = await check_is_name_unique(crud=crud_quizzes, item_name=quiz_in.name, db=db)
     if not is_unique:
