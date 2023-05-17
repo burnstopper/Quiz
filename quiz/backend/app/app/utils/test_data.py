@@ -1,11 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-from app.crud.quiz import crud as crud_quizzes
 from app.crud.template_tests import crud as crud_template_tests
-from app.models.template import Template
 from app.models.template_test import TemplateTest
-from app.schemas.template import Template as RequestedTemplate
 from app.schemas.template_test import TemplateTest
 from app.schemas.template_test import TemplateTest as Test
 
@@ -34,4 +31,3 @@ async def get_tests(template_id: int, db: AsyncSession) -> list[Test]:
         tests[test.index] = get_test_data(test_id=test.test_id)
 
     return tests
-
