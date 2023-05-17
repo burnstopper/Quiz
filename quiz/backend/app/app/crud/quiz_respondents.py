@@ -33,5 +33,13 @@ class CRUDQuizRespondents:
 
         return list((await db.execute(query)).scalars().all())
 
+    async def get_quiz_respondents(self, quiz_id: int, db: AsyncSession) -> list[int]:
+        query = (
+            select(self.model.respondent_id)
+            .where(self.model.quiz_id == quiz_id)
+        )
+
+        return list((await db.execute(query)).scalars().all())
+
 
 crud = CRUDQuizRespondents(QuizRespondent)

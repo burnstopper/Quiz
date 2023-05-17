@@ -75,13 +75,27 @@ async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_
     if respondent_id is None:
         return await crud_quizzes.get_all_quizzes(db=db)
 
-    respondent_quizzes_ids: list[int] = await crud_quiz_respondents.get_respondent_quizzes(respondent_id=respondent_id, db=db)
+    respondent_quizzes_ids: list[int] = await crud_quiz_respondents.get_respondent_quizzes(respondent_id=respondent_id,
+                                                                                           db=db)
 
     quizzes: list[Quiz | None] = [None] * len(respondent_quizzes_ids)
     for i in range(len(respondent_quizzes_ids)):
         quizzes[i] = await crud_quizzes.get_quiz_by_id(quiz_id=respondent_quizzes_ids[i], db=db)
 
     return quizzes
+
+
+@router.get('/{quiz_id}/respondents', status_code=status.HTTP_200_OK, response_model=list[int])
+async def get_quiz_respondents(quiz_id: int, db: AsyncSession = Depends(get_db)) -> list[int]:
+    """
+    Get quiz respondents
+    """
+
+    is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
+    if not is_valid:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
+
+    return await crud_quiz_respondents.get_quiz_respondents(quiz_id=quiz_id, db=db)
 
 
 @router.get('/{quiz_id}/check_access')
