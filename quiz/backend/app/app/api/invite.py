@@ -5,7 +5,6 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.quizzes import has_access_to_quiz
-from app.api.token import get_respondent_id_by_token
 from app.crud.quiz import crud as crud_quizzes
 from app.crud.quiz_respondents import crud as crud_quiz_respondents
 from app.database.dependencies import get_db
