@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     SPB_SERVICE_URL: str
 
     TOKEN_SERVICE_URL: str
+    QUESTIONNAIRE_SERVICE_URL: str
 
     class Config:
         # case_sensitive: https://docs.pydantic.dev/usage/settings/#environment-variable-names
