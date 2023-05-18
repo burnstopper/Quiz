@@ -8,8 +8,8 @@ from app.core.config import settings
 from app.crud.quiz import crud as crud_quizzes
 from app.database.dependencies import get_db
 from app.schemas.quiz_result import QuizResult, QuizResultStatus
-from app.utils.validators import check_item_id_is_valid
 from app.utils.get_params_and_parse_results import get_params, parse_results_json
+from app.utils.validators import check_item_id_is_valid
 
 router = APIRouter()
 

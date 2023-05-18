@@ -187,3 +187,15 @@ async def test_has_access_to_quiz(async_client: AsyncClient):
     response = await async_client.get(url='/api/quizzes/1/check_access', params={'respondent_id': 123})
     assert response.status_code == status.HTTP_200_OK
     assert not json.loads(response.content)['has_access']
+
+
+async def test_get_quiz_respondents(async_client: AsyncClient):
+    # test getting quiz respondents
+    response = await async_client.get(url='/api/quizzes/1/respondents')
+    assert response.status_code == status.HTTP_200_OK
+    assert json.loads(response.content)['respondents'] == [1]
+
+    # test getting quiz respondents by invalid id
+    response = await async_client.get(url='/api/quizzes/4/respondents')
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert json.loads(response.content)['detail'] == 'Quiz with this id does not exist'

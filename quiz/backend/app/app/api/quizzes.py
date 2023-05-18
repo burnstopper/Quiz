@@ -85,8 +85,8 @@ async def get_quizzes(respondent_id: int = None, db: AsyncSession = Depends(get_
     return quizzes
 
 
-@router.get('/{quiz_id}/respondents', status_code=status.HTTP_200_OK, response_model=list[int])
-async def get_quiz_respondents(quiz_id: int, db: AsyncSession = Depends(get_db)) -> list[int]:
+@router.get('/{quiz_id}/respondents', status_code=status.HTTP_200_OK, response_class=JSONResponse)
+async def get_quiz_respondents(quiz_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
     Get quiz respondents
     """
@@ -95,10 +95,13 @@ async def get_quiz_respondents(quiz_id: int, db: AsyncSession = Depends(get_db))
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
 
-    return await crud_quiz_respondents.get_quiz_respondents(quiz_id=quiz_id, db=db)
+    return JSONResponse(status_code=status.HTTP_200_OK,
+                        content={
+                            'respondents': await crud_quiz_respondents.get_quiz_respondents(quiz_id=quiz_id, db=db)
+                        })
 
 
-@router.get('/{quiz_id}/check_access')
+@router.get('/{quiz_id}/check_access', status_code=status.HTTP_200_OK, response_class=JSONResponse)
 async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession = Depends(get_db)) -> JSONResponse:
     """
     Check has the respondent access to quiz
