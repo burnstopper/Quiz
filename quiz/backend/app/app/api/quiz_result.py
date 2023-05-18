@@ -7,16 +7,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.crud.quiz import crud as crud_quizzes
 from app.database.dependencies import get_db
-from app.schemas.quiz_result import QuizResult, QuizResultStatus
+from app.schemas.quiz_results import QuizResults, QuizResultsStatus
 from app.utils.get_params_and_parse_results import get_params, parse_results_json
 from app.utils.validators import check_item_id_is_valid
 
 router = APIRouter()
 
 
-@router.get('/{quiz_id}/status', status_code=status.HTTP_200_OK, response_model=QuizResultStatus)
-async def get_quiz_result_status(quiz_id: int, respondent_id: int = None,
-                                 db: AsyncSession = Depends(get_db)) -> QuizResultStatus:
+@router.get('/{quiz_id}/status', status_code=status.HTTP_200_OK, response_model=QuizResultsStatus)
+async def get_quiz_results_status(quiz_id: int, respondent_id: int = None,
+                                  db: AsyncSession = Depends(get_db)) -> QuizResultsStatus:
     """
     Get result status of quiz by id
     """
@@ -34,11 +34,11 @@ async def get_quiz_result_status(quiz_id: int, respondent_id: int = None,
                                     headers={'Authorization': f'Bearer {settings.TEST_SERVICES_BEARER_TOKEN}'}
                                     )
 
-    return QuizResultStatus(**{'quiz_id': quiz_id, 'tests_status': response.content})
+    return QuizResultsStatus(**{'quiz_id': quiz_id, 'tests_status': response.content})
 
 
-@router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=QuizResult)
-async def get_quiz_result(quiz_id: int, respondent_id: int = None, db: AsyncSession = Depends(get_db)) -> QuizResult:
+@router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=QuizResults)
+async def get_quiz_results(quiz_id: int, respondent_id: int = None, db: AsyncSession = Depends(get_db)) -> QuizResults:
     """
     Get result of quiz by id
     """
@@ -56,32 +56,32 @@ async def get_quiz_result(quiz_id: int, respondent_id: int = None, db: AsyncSess
                                     headers={'Authorization': f'Bearer {settings.TEST_SERVICES_BEARER_TOKEN}'}
                                     )
 
-    tests_result = parse_results_json(results_json=response.json())
-    return QuizResult(**{'quiz_id': quiz_id, 'tests_result': tests_result})
+    tests_results = parse_results_json(results_json=response.json())
+    return QuizResults(**{'quiz_id': quiz_id, 'tests_result': tests_results})
 
 
-@router.get('/status/', status_code=status.HTTP_200_OK, response_model=list[QuizResultStatus])
-async def get_quizzes_result_status(quizzes_ids: Annotated[list[int], Query()], respondent_id: int = None,
-                                    db: AsyncSession = Depends(get_db)) -> list[QuizResultStatus]:
+@router.get('/status/', status_code=status.HTTP_200_OK, response_model=list[QuizResultsStatus])
+async def get_quizzes_results_status(quizzes_ids: Annotated[list[int], Query()], respondent_id: int = None,
+                                     db: AsyncSession = Depends(get_db)) -> list[QuizResultsStatus]:
     """
     Get result status of quizzes
     """
 
-    result_status: list[QuizResultStatus | None] = [None] * len(quizzes_ids)
+    results_status: list[QuizResultsStatus | None] = [None] * len(quizzes_ids)
     for i in range(len(quizzes_ids)):
-        result_status[i] = await get_quiz_result_status(quiz_id=quizzes_ids[i], respondent_id=respondent_id, db=db)
-    return result_status
+        results_status[i] = await get_quiz_results_status(quiz_id=quizzes_ids[i], respondent_id=respondent_id, db=db)
+    return results_status
 
 
-@router.get('/', status_code=status.HTTP_200_OK, response_model=list[QuizResult])
-async def get_quizzes_result(quizzes_ids: Annotated[list[int], Query()], respondent_id: int = None,
-                             db: AsyncSession = Depends(get_db)) -> list[QuizResult]:
+@router.get('/', status_code=status.HTTP_200_OK, response_model=list[QuizResults])
+async def get_quizzes_results(quizzes_ids: Annotated[list[int], Query()], respondent_id: int = None,
+                              db: AsyncSession = Depends(get_db)) -> list[QuizResults]:
     """
     Get result of quizzes
     """
 
-    result: list[QuizResult | None] = [None] * len(quizzes_ids)
+    results: list[QuizResults | None] = [None] * len(quizzes_ids)
     for i in range(len(quizzes_ids)):
-        result[i] = await get_quiz_result(quiz_id=quizzes_ids[i], respondent_id=respondent_id, db=db)
+        results[i] = await get_quiz_results(quiz_id=quizzes_ids[i], respondent_id=respondent_id, db=db)
 
-    return result
+    return results

@@ -3,13 +3,13 @@ from pydantic import BaseModel, Field
 from app.schemas.template_test import TemplateTestResults
 
 
-class QuizResultBase(BaseModel):
+class QuizResultsBase(BaseModel):
     quiz_id: int = Field(ge=1)
 
 
-class QuizResult(QuizResultBase):
+class QuizResults(QuizResultsBase):
     tests_result: list[TemplateTestResults]
 
 
-class QuizResultStatus(QuizResultBase):
+class QuizResultsStatus(QuizResultsBase):
     tests_status: bool
