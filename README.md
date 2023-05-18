@@ -6,6 +6,11 @@
 
 В нём находятся следующие переменные:
 
+- HOST — хост этого микросервиса для invite-ссылок на опрос
+- PORT — порт этого микросервиса для invite-ссылок на опрос
+
+- WORKERS_PER_CORE
+- WEB_CONCURRENCY
 - SQLALCHEMY_DATABASE_URL="sqlite+aiosqlite:///app/storage/quizzes_databases.db" — путь к базе данных
 - BEARER_TOKEN="JhbGciOiJIUzI1NiIsInR5I6IkpXVCJ9JzdWIiOiJKdXN0IGFGF2VzcyB0b2tlbiB0byBjb21t5pY2F0ZSB3dGloIFVzIifQ" — токен доступа к микросервису Пользователь
 - TOKEN_SERVICE_URL="185.46.11.65:80" — ссылка на микросервис Пользователь
