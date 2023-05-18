@@ -107,6 +107,10 @@ async def has_access_to_quiz(quiz_id: int, respondent_id: int, db: AsyncSession 
     Check has the respondent access to quiz
     """
 
+    is_valid: bool = await check_item_id_is_valid(crud=crud_quizzes, item_id=quiz_id, db=db)
+    if not is_valid:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
+
     has_access: bool = await has_respondent_added_to_quiz(quiz_id=quiz_id,
                                                           respondent_id=respondent_id,
                                                           db=db)
