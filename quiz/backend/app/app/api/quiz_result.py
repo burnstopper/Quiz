@@ -60,7 +60,7 @@ async def get_quiz_result(quiz_id: int, respondent_id: int = None, db: AsyncSess
     return QuizResult(**{'quiz_id': quiz_id, 'tests_result': tests_result})
 
 
-@router.get('/status', status_code=status.HTTP_200_OK, response_model=list[QuizResultStatus])
+@router.get('/status/', status_code=status.HTTP_200_OK, response_model=list[QuizResultStatus])
 async def get_quizzes_result_status(quizzes_ids: Annotated[list[int], Query()], respondent_id: int = None,
                                     db: AsyncSession = Depends(get_db)) -> list[QuizResultStatus]:
     """
