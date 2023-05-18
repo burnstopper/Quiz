@@ -28,7 +28,7 @@ async def create_quiz(quiz_in: QuizCreate, db: AsyncSession = Depends(get_db)) -
     is_unique: bool = await check_is_name_unique(crud=crud_quizzes, item_name=quiz_in.name, db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail='Quiz with this name has already been created')
+                            detail='Quiz with this name already has been created')
 
     new_id: int = (await crud_quizzes.get_last_id(db=db)) + 1
     return await crud_quizzes.create_new_quiz(quiz_in=quiz_in, new_id=new_id, db=db)
@@ -48,7 +48,7 @@ async def update_quiz(quiz_id: int, quiz_in: QuizUpdate, db: AsyncSession = Depe
                                                              db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail='Quiz with this name has already been created')
+                            detail='Quiz with this name already has been created')
 
     return await crud_quizzes.update_quiz(quiz_id=quiz_id, quiz_in=quiz_in, db=db)
 

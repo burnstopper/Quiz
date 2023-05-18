@@ -27,7 +27,7 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
     is_unique: bool = await check_is_name_unique(crud=crud_templates, item_name=template_in.name, db=db)
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail='FullTemplate with this name has already been created')
+                            detail='Template with this name has already been created')
 
     is_valid_tests_ids: bool = check_test_id_is_valid(tests_ids=template_in.tests_ids)
     if not is_valid_tests_ids:
@@ -60,6 +60,7 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Template with this name has already been created')
+
     is_valid_tests_ids: bool = check_test_id_is_valid(tests_ids=template_in.tests_ids)
     if not is_valid_tests_ids:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Invalid test id')
