@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from app.core.config import settings
 
 
 # https://fastapi.tiangolo.com/tutorial/sql-databases/#create-the-pydantic-models
@@ -17,7 +18,7 @@ class QuizCreate(QuizBase):
 
 class Quiz(QuizCreate):
     id: int = Field(ge=1)
-    invite_link: str = Field(regex=r'/invite/quizzes/\d/add')
+    invite_link: str = Field(regex=f'http://{settings.HOST}:{settings.PORT}/invite/quizzes/\d/add')
 
     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
     class Config:

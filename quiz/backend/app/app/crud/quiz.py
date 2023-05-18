@@ -11,7 +11,7 @@ class CRUDQuiz(CRUDBase[Quiz]):
         new_quiz = Quiz(name=quiz_in.name.strip(),
                         template_id=quiz_in.template_id,
                         description=quiz_in.description,
-                        invite_link=f'/invite/quizzes/{new_id}/add'
+                        invite_link=f'http://{settings.HOST}:{settings.PORT}/invite/quizzes/{new_id}/add'
                         )
         db.add(new_quiz)
         await db.commit()
