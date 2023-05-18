@@ -2,12 +2,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.quiz import crud as crud_quizzes
 from app.models.template import Template
-from app.schemas.template import Template as RequestedTemplate
+from app.schemas.template import FullTemplate
 from app.utils.test_data import get_test_data, get_tests
 
 
 async def get_requested_template(template: Template, tests_ids: list[int] = None,
-                                 db: AsyncSession = None) -> RequestedTemplate:
+                                 db: AsyncSession = None) -> FullTemplate:
     requested_template = {'id': template.id,
                           'name': template.name
                           }
@@ -20,4 +20,4 @@ async def get_requested_template(template: Template, tests_ids: list[int] = None
         requested_template['quizzes'] = await crud_quizzes.get_quizzes_by_template_id(template_id=template.id, db=db)
         requested_template['tests'] = await get_tests(template_id=template.id, db=db)
 
-    return RequestedTemplate(**requested_template)
+    return FullTemplate(**requested_template)

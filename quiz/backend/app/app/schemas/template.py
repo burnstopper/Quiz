@@ -19,6 +19,9 @@ class TemplateCreate(TemplateBase):
 class Template(TemplateBase):
     id: int = Field(ge=1)
     tests: list[TemplateTest] | None
+
+
+class FullTemplate(Template):
     quizzes: list[Quiz] | None
 
     # https://fastapi.tiangolo.com/tutorial/sql-databases/#use-pydantics-orm_mode
