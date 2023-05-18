@@ -31,7 +31,7 @@ async def create_template(template_in: TemplateCreate, db: AsyncSession = Depend
 
     is_valid_tests_ids: bool = check_test_id_is_valid(tests_ids=template_in.tests_ids)
     if not is_valid_tests_ids:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Invalid test id')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Invalid test id')
 
     new_template: Template = await crud_templates.create_template(template_in=template_in, db=db)
     new_id: int = (await crud_templates.get_last_id(db=db)) + 1
