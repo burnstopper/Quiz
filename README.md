@@ -15,6 +15,7 @@
 - ```BEARER_TOKEN``` — токен доступа к микросервису Пользователь
 - ```TOKEN_SERVICE_URL```="185.46.11.65:80" — ссылка на микросервис Пользователь
 - ```COUNT_TESTS_SERVICES```=5 — количество тестов (+ микросервис Анкета)
+- ```REQUESTS_EXPIRATION_TIME_IN_MINUTES```
 
 
 - ```TEST_SERVICES_BEARER_TOKEN``` — токен доступа к микросервисам Тестов
@@ -35,6 +36,9 @@
 
 - ```SPB_SERVICE_NAME```
 - ```SPB_SERVICE_URL```
+
+- ```QUESTIONNAIRE_SERVICE_NAME```
+- ```QUESTIONNAIRE_SERVICE_URL```
 
 
 # Запуск

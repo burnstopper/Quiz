@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     BEARER_TOKEN: str
     COUNT_TESTS_SERVICES: int
     REQUESTS_EXPIRATION_TIME_IN_MINUTES: int
+    LOG_LEVEL: str = "error"
 
     TEST_SERVICES_BEARER_TOKEN: str
     TEST_SERVICE_URL: str
@@ -30,8 +31,10 @@ class Settings(BaseSettings):
     SPB_SERVICE_NAME: str
     SPB_SERVICE_URL: str
 
-    TOKEN_SERVICE_URL: str
+    QUESTIONNAIRE_SERVICE_NAME: str
     QUESTIONNAIRE_SERVICE_URL: str
+
+    TOKEN_SERVICE_URL: str
 
     class Config:
         # case_sensitive: https://docs.pydantic.dev/usage/settings/#environment-variable-names

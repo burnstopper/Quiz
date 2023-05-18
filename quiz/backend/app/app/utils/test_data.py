@@ -20,6 +20,10 @@ def get_test_data(test_id: int) -> Test:
             return Test(**{'id': 3, 'name': settings.COPING_SERVICE_NAME, 'url': settings.COPING_SERVICE_URL})
         case 4:
             return Test(**{'id': 4, 'name': settings.SPB_SERVICE_NAME, 'url': settings.SPB_SERVICE_URL})
+        case 5:
+            return Test(
+                **{'id': 5, 'name': settings.QUESTIONNAIRE_SERVICE_NAME, 'url': settings.QUESTIONNAIRE_SERVICE_URL}
+            )
 
 
 async def get_tests(template_id: int, db: AsyncSession) -> list[Test]:
