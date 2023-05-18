@@ -6,35 +6,35 @@
 
 В нём находятся следующие переменные:
 
-- HOST — хост этого микросервиса для invite-ссылок на опрос
-- PORT — порт этого микросервиса для invite-ссылок на опрос
+- ```HOST``` — хост этого микросервиса для invite-ссылок на опрос
+- ```PORT``` — порт этого микросервиса для invite-ссылок на опрос
 
-- WORKERS_PER_CORE
-- WEB_CONCURRENCY
-- SQLALCHEMY_DATABASE_URL="sqlite+aiosqlite:///app/storage/quizzes_databases.db" — путь к базе данных
-- BEARER_TOKEN="JhbGciOiJIUzI1NiIsInR5I6IkpXVCJ9JzdWIiOiJKdXN0IGFGF2VzcyB0b2tlbiB0byBjb21t5pY2F0ZSB3dGloIFVzIifQ" — токен доступа к микросервису Пользователь
-- TOKEN_SERVICE_URL="185.46.11.65:80" — ссылка на микросервис Пользователь
-- COUNT_TESTS_SERVICES=5 — количество тестов (+ микросервис Анкета)
-
-
-- TEST_SERVICES_BEARER_TOKEN="ycK0pFhS6akv" — токен доступа к микросервисам Тестов
-- TEST_SERVICE_URL="http://194.67.126.160:8080" — ссылка на api compose микросервисов Тестов
+- ```WORKERS_PER_CORE```
+- ```WEB_CONCURRENCY```
+- ```SQLALCHEMY_DATABASE_URL```="sqlite+aiosqlite:///app/storage/quizzes_databases.db" — путь к базе данных
+- ```BEARER_TOKEN``` — токен доступа к микросервису Пользователь
+- ```TOKEN_SERVICE_URL```="185.46.11.65:80" — ссылка на микросервис Пользователь
+- ```COUNT_TESTS_SERVICES```=5 — количество тестов (+ микросервис Анкета)
 
 
-- BURNOUT_SERVICE_NAME="Burnout" — название теста
-- BURNOUT_SERVICE_URL="http://194.67.126.160:8081" — ссылка на тест выгорания
+- ```TEST_SERVICES_BEARER_TOKEN``` — токен доступа к микросервисам Тестов
+- ```TEST_SERVICE_URL``` — ссылка на api compose микросервисов Тестов
 
 
-- FATIGUE_SERVICE_NAME="Fatigue"
-- FATIGUE_SERVICE_URL="http://194.67.126.160:8082"
+- ```BURNOUT_SERVICE_NAME``` — название теста
+- ```BURNOUT_SERVICE_URL``` — ссылка на тест выгорания
 
 
-- COPING_SERVICE_NAME="Coping"
-- COPING_SERVICE_URL="http://194.67.126.160:8083"
+- ```FATIGUE_SERVICE_NAME```
+- ```FATIGUE_SERVICE_URL```
 
 
-- SPB_SERVICE_NAME="SPB"
-- SPB_SERVICE_URL="http://194.67.126.160:8084"
+- ```COPING_SERVICE_NAME```
+- ```COPING_SERVICE_URL```
+
+
+- ```SPB_SERVICE_NAME```
+- ```SPB_SERVICE_URL```
 
 
 # Запуск
