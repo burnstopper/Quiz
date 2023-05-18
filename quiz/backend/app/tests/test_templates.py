@@ -1,13 +1,9 @@
 import json
 
-import pytest
 from fastapi import status
 from httpx import AsyncClient
-from sqlalchemy import delete
 
 from app.core.config import settings
-from app.models.quiz import Quiz
-from tests.conftest import async_session_maker
 
 created_template_1 = {
     'name': 'Created Template 1',
@@ -150,6 +146,14 @@ async def test_create_template(async_client: AsyncClient):
     })
     assert response.status_code == status.HTTP_409_CONFLICT
 
+    # test creating a new template with invalid test id
+    response = await async_client.post(url='/api/templates/', json={
+        'name': 'Created Template 4',
+        'tests_ids': [1, 2, 6]
+    })
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert json.loads(response.content)['detail'] == 'Invalid test id'
+
 
 async def test_update_template(async_client: AsyncClient):
     # test updating the template by id
@@ -183,6 +187,14 @@ async def test_update_template(async_client: AsyncClient):
     })
     assert response.status_code == status.HTTP_409_CONFLICT
     assert json.loads(response.content)['detail'] == 'Template with this name has already been created'
+
+    # test updating the template with invalid test id
+    response = await async_client.put(url='/api/templates/1', json={
+        'name': 'Updated Template 1',
+        'tests_ids': [1, 2, 6]
+    })
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert json.loads(response.content)['detail'] == 'Invalid test id'
 
 
 async def test_get_template_by_id(async_client: AsyncClient):
