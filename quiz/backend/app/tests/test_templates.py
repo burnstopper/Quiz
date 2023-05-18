@@ -1,10 +1,13 @@
 import json
 
+import pytest
 from fastapi import status
 from httpx import AsyncClient
+from sqlalchemy import delete
 
 from app.core.config import settings
-from tests.test_quizzes import quiz_3
+from app.models.quiz import Quiz
+from tests.conftest import async_session_maker
 
 created_template_1 = {
     'name': 'Created Template 1',
@@ -25,8 +28,7 @@ created_template_1 = {
             'name': settings.COPING_SERVICE_NAME,
             'url': settings.COPING_SERVICE_URL
         }
-    ],
-    'quizzes': None
+    ]
 }
 
 created_template_2 = {
@@ -43,8 +45,7 @@ created_template_2 = {
             'name': settings.FATIGUE_SERVICE_NAME,
             'url': settings.FATIGUE_SERVICE_URL
         }
-    ],
-    'quizzes': None
+    ]
 }
 
 created_template_3 = {
@@ -61,8 +62,7 @@ created_template_3 = {
             'name': settings.BURNOUT_SERVICE_NAME,
             'url': settings.BURNOUT_SERVICE_URL
         }
-    ],
-    'quizzes': None
+    ]
 }
 
 updated_template_1 = {
@@ -84,55 +84,64 @@ updated_template_1 = {
             'name': settings.COPING_SERVICE_NAME,
             'url': settings.COPING_SERVICE_URL
         }
-    ],
-    'quizzes': None
+    ]
 }
 
-template_1 = {
-    'name': 'Updated Template 1',
-    'id': 1,
-    'tests': [
-        {
-            'id': 2,
-            'name': settings.FATIGUE_SERVICE_NAME,
-            'url': settings.FATIGUE_SERVICE_URL
-        },
-        {
-            'id': 1,
-            'name': settings.BURNOUT_SERVICE_NAME,
-            'url': settings.BURNOUT_SERVICE_URL
-        },
-        {
-            'id': 3,
-            'name': settings.COPING_SERVICE_NAME,
-            'url': settings.COPING_SERVICE_URL
-        }
-    ],
-    'quizzes': []
-}
+template_1: dict[str, int | list | str] = updated_template_1.copy()
+template_1['quizzes'] = []
 
-template_2 = created_template_2
-template_3 = created_template_3
-template_3['quizzes'] = [quiz_3]
+template_2: dict[str, int | list | str] = created_template_2.copy()
+template_2['quizzes'] = [
+    {
+        'name': 'Updated Quiz 2',
+        'description': 'Test updating Quiz 2',
+        'template_id': 2,
+        'invite_link': f'http://{settings.HOST}:{settings.PORT}/invite/quizzes/2/add',
+        'id': 2
+    },
+    {
+        'name': 'Created Quiz 3',
+        'description': 'Test creating Quiz 3',
+        'template_id': 2,
+        'invite_link': f'http://{settings.HOST}:{settings.PORT}/invite/quizzes/3/add',
+        'id': 3
+    }
+]
+
+template_3: dict[str, int | list | str] = created_template_3.copy()
+template_3['quizzes'] = [
+    {
+        'name': 'Updated Quiz 1',
+        'description': 'Test updating Quiz 1',
+        'template_id': 3,
+        'invite_link': f'http://{settings.HOST}:{settings.PORT}/invite/quizzes/1/add',
+        'id': 1
+    }
+]
 
 
 async def test_create_template(async_client: AsyncClient):
     # test creating a new template
-    tests_ids = [1, 2, 3]
     response = await async_client.post(url='/api/templates/', json={
         'name': 'Created Template 1',
-        'tests_ids': tests_ids
+        'tests_ids': [1, 2, 3]
     })
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == created_template_1
 
-    tests_ids: list[int] = [1, 2]
     response = await async_client.post(url='/api/templates/', json={
         'name': 'Created Template 2',
-        'tests_ids': tests_ids,
+        'tests_ids': [1, 2]
     })
     assert response.status_code == status.HTTP_201_CREATED
     assert response.json() == created_template_2
+
+    response = await async_client.post(url='/api/templates/', json={
+        'name': 'Created Template 3',
+        'tests_ids': [4, 1]
+    })
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.json() == created_template_3
 
     # test creating a new template with the name that already exists
     response = await async_client.post(url='/api/templates/', json={
@@ -141,32 +150,22 @@ async def test_create_template(async_client: AsyncClient):
     })
     assert response.status_code == status.HTTP_409_CONFLICT
 
-    tests_ids = [4, 1]
-    response = await async_client.post(url='/api/templates/', json={
-        'name': 'Created Template 3',
-        'tests_ids': tests_ids
-    })
-    assert response.status_code == status.HTTP_201_CREATED
-    assert response.json() == created_template_3
-
 
 async def test_update_template(async_client: AsyncClient):
     # test updating the template by id
-    updated_first_template_tests_ids = [2, 1, 3]
     response = await async_client.put(url='/api/templates/1', json={
         'name': 'Updated Template 1',
-        'tests_ids': updated_first_template_tests_ids
+        'tests_ids': [2, 1, 3]
     })
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == updated_template_1
 
-    # tes updating the template that has quizzes
-    updated_second_template_tests_ids = [4, 1]
+    # test updating the template that has quizzes
     response = await async_client.put(url='/api/templates/2', json={
         'name': 'Updated Template 2',
-        'tests_ids': updated_second_template_tests_ids
+        'tests_ids': [4, 1]
     })
-    assert response.status_code != status.HTTP_409_CONFLICT
+    assert response.status_code == status.HTTP_409_CONFLICT
     assert json.loads(response.content)['detail'] == 'This template already has quizzes'
 
     # test updating the quiz by invalid id
@@ -179,7 +178,7 @@ async def test_update_template(async_client: AsyncClient):
 
     # test updating the template with the name that already exists
     response = await async_client.put(url='/api/templates/1', json={
-        'name': ' Updated Template 2 ',
+        'name': ' Created Template 2 ',
         'tests_ids': [1, 2]
     })
     assert response.status_code == status.HTTP_409_CONFLICT
@@ -202,4 +201,4 @@ async def test_get_all_templates(async_client: AsyncClient):
     # test getting all template with corresponding quizzes
     response = await async_client.get(url='/api/templates/')
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == [template_1, template_2]
+    assert response.json() == [template_1, template_2, template_3]
