@@ -5,6 +5,8 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     # url naming: https://docs.sqlalchemy.org/en/20/core/engines.html#sqlite
+    HOST: str
+    PORT: str
 
     WORKERS_PER_CORE: int = 1
     WEB_CONCURRENCY: str | None
