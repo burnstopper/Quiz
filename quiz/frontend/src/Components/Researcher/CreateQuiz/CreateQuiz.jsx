@@ -41,30 +41,42 @@ class Quiz extends Component {
 		};
 	}
 
+	async createToken() {
+		let token = await axios
+			.post("localhost:8001/api/token/create_respondent")
+			.then((x) => x.data)
+			.catch(() => {});
+		CookieLib.setCookieToken(token);
+		return token;
+	}
+
 	componentDidMount() {
 		let getData = {
 			getToken: async () => {
 				let token = CookieLib.getCookieToken();
-				let id = await axios.get(`/token/${token}/id`);
 				// let id = "123213121";
-				if (!token || !id) {
-					token = await axios
-						.post("/token/create-respondent")
-						.then((x) => x.data)
-						.catch(() => {});
-					CookieLib.setCookieToken(token);
-				}
+				if (!token) token = await this.createToken();
+
+				let id = await axios
+					.get(`localhost:8001/api/token/${token}/id`)
+					.then((x) => x.data);
+				if (!token) token = await this.createToken();
+
 				this.setState({ token, id });
 			},
 			checkPermission: async () => {
 				let check = await axios
-					.get(`/token/${this.state.quiz_id}/check_researcher`)
+					.get(
+						`localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
+					)
 					.then((x) => x.data);
 				// let check = true;
 				this.setState({ check });
 			},
 			getTemplates: async () => {
-				let templates = await axios.get(`/templates`).then((x) => x.data);
+				let templates = await axios
+					.get(`localhost:8001/api/templates`)
+					.then((x) => x.data);
 				// let templates = [
 				// 	{
 				// 		name: "Шаблон 1",

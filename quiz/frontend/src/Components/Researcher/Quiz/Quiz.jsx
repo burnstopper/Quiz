@@ -2,43 +2,54 @@ import React, { Component } from "react";
 import data from "../../../data";
 import "./Quiz.css";
 import CookieLib from "../../../cookielib/index";
-import axios from "axios";
 import LoadingScreen from "react-loading-screen";
 import { Spinner } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { useParams, Navigate } from "react-router-dom";
-
-const tests = [
-	{
-		name: "Какой-то там первый",
-		link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-	},
-	{
-		name: "Второй",
-		link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-	},
-	{
-		name: "Третий",
-		link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-	},
-	{
-		name: "Четвертый",
-		link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-	},
-];
-
-function withParams(Component) {
-	return (props) => <Component {...props} params={useParams()} />;
+import { Link, Navigate } from "react-router-dom";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import { Draggable, Droppable } from "react-drag-and-drop";
+import Dropdown from "react-bootstrap/Dropdown";
+import Accordion from "react-bootstrap/Accordion";
+import axios from "axios";
+let i = 0;
+function isBlank(str) {
+	return !str || /^\s*$/.test(str);
 }
 
-class Quiz extends Component {
+function array_move(arr, old_index, new_index) {
+	if (new_index >= arr.length) {
+		var k = new_index - arr.length + 1;
+		while (k--) {
+			arr.push(undefined);
+		}
+	}
+	arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+	return arr; // for testing
+}
+
+export default class Templates extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			data: new data(),
-			quiz_id: this.props.params.quiz,
+			group: 1,
 			loading: true,
+			isModalOpen: false,
+			title: "Опросы",
+			list: ["Пусто"],
 		};
+	}
+
+	handleDrop(data, index) {
+		let array = Array.from(this.state.template.tests_ids);
+		// let tmp = array[data.tests];
+		let result = array_move(array, data.tests, index);
+		// array[data.tests] = array[this.index];
+		// array[this.index] = tmp;
+		let template = this.state.template;
+		template.tests_ids = result;
+		this.setState({ template });
+		console.log(this.state.template);
 	}
 
 	async createToken() {
@@ -65,12 +76,10 @@ class Quiz extends Component {
 				this.setState({ token, id });
 			},
 			checkPermission: async () => {
-				let check = await axios
-					.get(
-						`localhost:8001/api/quizes/${this.state.quiz_id}/respondent/${this.state.id}`
-					)
-					.then((x) => x.data);
-				// let check = true;
+				// let check = await axios
+				// 	.get(`/token/${this.state.quiz_id}/check_researcher`)
+				// 	.then((x) => x.data);
+				let check = true;
 				this.setState({ check });
 			},
 			getQuiz: async () => {
@@ -124,48 +133,30 @@ class Quiz extends Component {
 					<span className="sr-only">Loading...</span>
 				</Spinner>
 			</>
-		) : this.state.check && this.state.quiz?.name ? (
+		) : this.state.check ? (
 			<div className="parent">
-				<div id="upTile">
-					<p id="text">{this.state.quiz.name}</p>
-					<p id="desc">{this.state.quiz.description}</p>
+				<div class="container">
+					<Accordion id="accord-block" defaultActiveKey="0">
+						<Accordion.Item id="accord-item" eventKey="0">
+							<Accordion.Header>Название</Accordion.Header>
+							<Accordion.Body>
+								Кол-во участников <br /> Участник (63%) 1 <br /> Участник 2 (0%)
+							</Accordion.Body>
+						</Accordion.Item>
+					</Accordion>
+					<Accordion id="accord-block" defaultActiveKey="0">
+						<Accordion.Item id="accord-item" eventKey="0">
+							<Accordion.Header>Ссылка</Accordion.Header>
+							<Accordion.Body id="accord-text">
+								Кол-во участников <br /> Участник (63%) 1 <br /> Участник 2 (0%)
+							</Accordion.Body>
+						</Accordion.Item>
+					</Accordion>
 				</div>
-
-				<div id="btnTile">
-					{this.state.quiz.template.tests_ids.map((x, i) => {
-						console.log(this.state.quiz.results[x]?.length);
-						if (
-							this.state.quiz.results[this.state.quiz.template.tests_ids[i - 1]]
-								?.length > 0 ||
-							i === 0
-						)
-							return (
-								<Link
-									id="btnQuiz"
-									style={{ textDecoration: "none" }}
-									to={`${tests[x].link}`}
-									key={i}
-								>
-									<a id="titleTile">{tests[x].name}</a>
-									<span class="icon">
-										{this.state.quiz.results[x]?.length > 0 ? "✔️" : "⏱️"}
-									</span>
-								</Link>
-							);
-						else
-							return (
-								<div id="btnQuizDis" key={i}>
-									<a id="titleTile">{tests[x].name}</a>
-									<span class="icon">🔒</span>
-								</div>
-							);
-					})}
-				</div>
+				<div className="calendar"></div>
 			</div>
 		) : (
 			<Navigate to="/quizes" replace={true} />
 		);
 	}
 }
-
-export default withParams(Quiz);

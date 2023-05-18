@@ -23,31 +23,41 @@ export default class List extends Component {
 		};
 	}
 
+	async createToken() {
+		let token = await axios
+			.post("localhost:8001/api/token/create_respondent")
+			.then((x) => x.data)
+			.catch(() => {});
+		CookieLib.setCookieToken(token);
+		return token;
+	}
+
 	componentDidMount() {
 		let getData = {
 			getToken: async () => {
 				let token = CookieLib.getCookieToken();
-				let id = await axios.get(`token/${token}/id`);
 				// let id = "123213121";
-				if (!token || !id) {
-					token = await axios
-						.post("/token/create-respondent")
-						.then((x) => x.data)
-						.catch(() => {});
-					CookieLib.setCookieToken(token);
-				}
+				if (!token) token = await this.createToken();
+
+				let id = await axios
+					.get(`localhost:8001/api/token/${token}/id`)
+					.then((x) => x.data);
+				if (!token) token = await this.createToken();
+
 				this.setState({ token, id });
 			},
 			checkPermission: async () => {
 				let check = await axios
-					.get(`/token/${this.state.quiz_id}/check_researcher`)
+					.get(
+						`localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
+					)
 					.then((x) => x.data);
 				// let check = true;
 				this.setState({ check });
 			},
 			getQuizes: async () => {
 				let quizes = await axios
-					.get("/quizes", {
+					.get("localhost:8001/api/quizes", {
 						params: {
 							// respondent_id: this.state.id,
 							results: true,
@@ -59,9 +69,9 @@ export default class List extends Component {
 				quizes = quizes.map(async (x) => ({
 					...quizes,
 					template: await axios
-						.get(`/templates/${x.template.id}`)
+						.get(`localhost:8001/api/templates/${x.template.id}`)
 						.then((x) => x.data),
-					results: await axios.get(`/results`, {
+					results: await axios.get(`localhost:8001/api/results`, {
 						params: { quiz_id: x.quiz_id },
 					}),
 				}));

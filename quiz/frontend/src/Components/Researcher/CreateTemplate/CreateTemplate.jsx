@@ -1,20 +1,29 @@
 import React, { Component } from "react";
 import data from "../../../data";
-import "./Template.css";
+import "./CreateTemplate.css";
 import CookieLib from "../../../cookielib/index";
-import axios from "axios";
 import LoadingScreen from "react-loading-screen";
 import { Spinner } from "react-bootstrap";
 import { Link, Navigate } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-
+import { Draggable, Droppable } from "react-drag-and-drop";
+import Dropdown from "react-bootstrap/Dropdown";
+import axios from "axios";
 let i = 0;
 function isBlank(str) {
 	return !str || /^\s*$/.test(str);
+}
+
+function array_move(arr, old_index, new_index) {
+	if (new_index >= arr.length) {
+		var k = new_index - arr.length + 1;
+		while (k--) {
+			arr.push(undefined);
+		}
+	}
+	arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+	return arr; // for testing
 }
 
 export default class Templates extends Component {
@@ -22,13 +31,25 @@ export default class Templates extends Component {
 		super(props);
 		this.state = {
 			data: new data(),
-			filter: "",
 			group: 1,
 			loading: true,
+			template_id: this.props.params?.template,
 			isModalOpen: false,
 			title: "Опросы",
 			list: ["Пусто"],
 		};
+	}
+
+	handleDrop(data, index) {
+		let array = Array.from(this.state.template.tests_ids);
+		// let tmp = array[data.tests];
+		let result = array_move(array, data.tests, index);
+		// array[data.tests] = array[this.index];
+		// array[this.index] = tmp;
+		let template = this.state.template;
+		template.tests_ids = result;
+		this.setState({ template });
+		console.log(this.state.template);
 	}
 
 	async createToken() {
@@ -63,13 +84,14 @@ export default class Templates extends Component {
 				// let check = true;
 				this.setState({ check });
 			},
-			getTemplates: async () => {
-				let templates = await axios
-					.get("localhost:8001/api/templates", {
+			getQuizes: async () => {
+				let template = await axios
+					.get(`localhost:8001/api/templates/${this.state.template_id}`, {
 						params: {
 							// respondent_id: this.state.id
 						},
 					})
+					.then((x) => x.data)
 					.catch(() => {});
 
 				// quizes = quizes.map(async (x) => ({
@@ -81,34 +103,37 @@ export default class Templates extends Component {
 				// 		params: { quiz_id: x.quiz_id },
 				// 	}),
 				// }));
-				// let templates = [
-				// 	{
-				// 		name: "Теплейт 1",
-				// 		id: 1,
-				// 		tests_ids: [2, 3, 4, 1],
-				// 		quizzes: [{ name: "Квиз 1" }],
-				// 	},
-				// 	{
-				// 		name: "Теплейт 3",
-				// 		id: 1,
-				// 		tests_ids: [2, 3, 4],
-				// 		quizzes: [
-				// 			{ name: "Квиз 1" },
-				// 			{ name: "Квиз 3" },
-				// 			{ name: "Квиз 2" },
-				// 			{ name: "Квиз 5" },
-				// 		],
-				// 	},
-				// 	{
-				// 		name: "Теплейт 2",
-				// 		id: 1,
-				// 		tests_ids: [2, 4, 1],
-				// 		quizzes: [{ name: "Квиз 1" }],
-				// 	},
-				// ];
+				// let template = {
+				// 	name: "Теплейт 3",
+				// 	id: 1,
+				// 	tests_ids: [2, 3, 4],
+				// 	quizzes: [
+				// 		{ name: "Квиз 1" },
+				// 		{ name: "Квиз 3" },
+				// 		{ name: "Квиз 2" },
+				// 		{ name: "Квиз 5" },
+				// 	],
+				// };
+
 				// console.log(templates);
 
-				this.setState({ templates, filtered: templates });
+				this.setState({ template });
+			},
+			getAllQuizes: async () => {
+				let tests = await axios
+					.get(`/api/tests`)
+					.then((x) => x.data)
+					.catch(() => {});
+				// let tests = [
+				// 	{ id: 1, name: "Что-то первое" },
+				// 	{ id: 2, name: "Что-то второе" },
+				// 	{ id: 3, name: "Что-то третье" },
+				// 	{ id: 4, name: "Что-то четвертое" },
+				// 	{ id: 5, name: "Что-то пятое" },
+				// ];
+				this.setState({
+					tests,
+				});
 			},
 		};
 		async function start() {
@@ -168,98 +193,56 @@ export default class Templates extends Component {
 				</Modal>
 
 				<div id="upTile">
-					<p id="text">Меню шаблонов</p>
+					<p id="text">Создание шаблона</p>
 					<div className="component-menu">
-						<input
-							id="search"
-							type="text"
-							placeholder="Поиск.."
-							onChange={(e) => this.setState({ filter: e.target.value })}
-						/>
+						<Dropdown>
+							<Dropdown.Toggle variant="success" id="dropdown-basic1">
+								Добавить тест
+							</Dropdown.Toggle>
 
-						<button
-							type="submit"
-							onClick={() => (window.location.href = "/quizes/create")}
-							id="btnPlays"
-						>
-							Создать шаблон
-						</button>
+							<Dropdown.Menu>
+								{this.state.tests
+									.filter((x) => !this.state.template.tests_ids.includes(x.id))
+									.map((x, i) => (
+										<Dropdown.Item key={x} onClick={this.handleMenu}>
+											<a id="titleTile">{x.name}</a>
+										</Dropdown.Item>
+									))}
+							</Dropdown.Menu>
+						</Dropdown>
 					</div>
 				</div>
 				<div id="btnTile">
-					{this.state.templates
-						.filter((x) =>
-							isBlank(this.state.filter)
-								? true
-								: x.name.toLowerCase().includes(this.state.filter.toLowerCase())
-						)
-						.map((x, i) => (
-							<Link
-								id="btnQuizes"
-								style={{ textDecoration: "none" }}
-								to={`#`}
-								key={i}
-							>
-								<a id="titleTile">{x.name}</a>
-
-								<div className="quizComponentContainer">
-									<button
-										onClick={() =>
-											this.setState({
-												isModalOpen: true,
-												title: "Тесты",
-												list: x.tests_ids,
-											})
-										}
-										id="quizBtnComponent"
-									>
-										Тесты
-									</button>
-									{/* <div className="dropasdasdown"> */}
-									<button
-										// onClick={() => (window.location.href += `/${x.id}`)}
-										onClick={() =>
-											this.setState({
-												isModalOpen: true,
-												title: "Опросы",
-												list: x.quizzes.map((x) => x.name),
-											})
-										}
-										id="quizBtnComponentDrop"
-									>
-										Опросы
-									</button>{" "}
-									{/* </div> */}
-									<button
-										onClick={() => (window.location.href += `/${x.id}`)}
-										id="quizBtnComponent"
-									>
-										Создать опрос
-									</button>
-									<button
-										onClick={() => (window.location.href += `/${x.id}/edit`)}
-										id="quizBtnComponent"
-									>
-										Редактировать
-									</button>
-								</div>
-							</Link>
-						))}
+					{this.state.template.tests_ids.map((x, i) => (
+						<Droppable
+							id="btnQuizes"
+							// styles={{ maxWidth: "1200px", minWidth: "900px", width: "80%" }}
+							key={i}
+							types={["tests"]}
+							onDrop={(data) => this.handleDrop.bind(this)(data, i)}
+						>
+							<Draggable id="draggable" type="tests" data={i}>
+								<a id="titleTile">
+									{this.state.tests.find((y) => y.id == x).name}
+								</a>
+							</Draggable>
+						</Droppable>
+					))}
 				</div>
 				{/* <div id="DownPagination">
-					<div className="pagination">
-						<a href="#">&#10094;</a>
-						<a className="active" href="#">
-							1
-						</a>
-						<a href="#">2</a>
-						<a href="#">3</a>
-						<a href="#">4</a>
-						<a href="#">5</a>
-						<a href="#">6</a>
-						<a href="#">&#10095;</a>
-					</div>
-				</div> */}
+        <div className="pagination">
+          <a href="#">&#10094;</a>
+          <a className="active" href="#">
+            1
+          </a>
+          <a href="#">2</a>
+          <a href="#">3</a>
+          <a href="#">4</a>
+          <a href="#">5</a>
+          <a href="#">6</a>
+          <a href="#">&#10095;</a>
+        </div>
+      </div> */}
 			</div>
 		) : (
 			<Navigate to="/quizes" replace={true} />
