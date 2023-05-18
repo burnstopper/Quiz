@@ -3,21 +3,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud.quiz import crud as crud_quizzes
 from app.models.template import Template
 from app.schemas.template import FullTemplate
+from app.schemas.template import Template as TemplateWithTests
 from app.utils.test_data import get_test_data, get_tests
 
 
-async def get_requested_template(template: Template, tests_ids: list[int] = None,
-                                 db: AsyncSession = None) -> FullTemplate:
+async def get_template_with_tests(template: Template, tests_ids: list[int]) -> TemplateWithTests:
     requested_template = {'id': template.id,
-                          'name': template.name
-                          }
+                          'name': template.name,
+                          'tests': [get_test_data(test_id=test_id) for test_id in tests_ids]}
 
-    # db is None, when function is called from creat_template or update_template endpoint, because db is committed
-    # In these cases we do not need quizzes of the template
-    if db is None:
-        requested_template['tests'] = [get_test_data(test_id=test_id) for test_id in tests_ids]
-    else:
-        requested_template['quizzes'] = await crud_quizzes.get_quizzes_by_template_id(template_id=template.id, db=db)
-        requested_template['tests'] = await get_tests(template_id=template.id, db=db)
+    return TemplateWithTests(**requested_template)
+
+
+async def get_full_template(template: Template, db: AsyncSession) -> FullTemplate:
+    requested_template = {'id': template.id,
+                          'name': template.name,
+                          'quizzes': await crud_quizzes.get_quizzes_by_template_id(template_id=template.id, db=db),
+                          'tests': await get_tests(template_id=template.id, db=db)}
 
     return FullTemplate(**requested_template)
