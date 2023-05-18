@@ -145,6 +145,7 @@ async def test_create_template(async_client: AsyncClient):
         'tests_ids': [1, 2, 4]
     })
     assert response.status_code == status.HTTP_409_CONFLICT
+    assert json.loads(response.content)['detail'] == 'Template with this name has already been created'
 
     # test creating a new template with invalid test id
     response = await async_client.post(url='/api/templates/', json={

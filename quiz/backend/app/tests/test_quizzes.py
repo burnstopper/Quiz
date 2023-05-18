@@ -102,6 +102,7 @@ async def test_create_quiz(async_client: AsyncClient, create_environment):
         'template_id': 1
     })
     assert response.status_code == status.HTTP_409_CONFLICT
+    assert json.loads(response.content)['detail'] == 'Quiz with this name already has been created'
 
 
 async def test_update_quiz(async_client: AsyncClient):
@@ -138,7 +139,7 @@ async def test_update_quiz(async_client: AsyncClient):
         'template_id': 2
     })
     assert response.status_code == status.HTTP_409_CONFLICT
-    assert json.loads(response.content)['detail'] == 'Quiz with this name has already been created'
+    assert json.loads(response.content)['detail'] == 'Quiz with this name already has been created'
 
 
 async def test_add_respondent_to_quiz(async_client: AsyncClient):
