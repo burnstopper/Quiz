@@ -60,6 +60,9 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
     if not is_unique:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail='Template with this name has already been created')
+    is_valid_tests_ids: bool = check_test_id_is_valid(tests_ids=template_in.tests_ids)
+    if not is_valid_tests_ids:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Invalid test id')
 
     updated_template: Template = await crud_templates.update_template(template_id=template_id, template_in=template_in,
                                                                       db=db)
