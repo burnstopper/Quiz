@@ -62,7 +62,7 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
                             detail='Template with this name has already been created')
     is_valid_tests_ids: bool = check_test_id_is_valid(tests_ids=template_in.tests_ids)
     if not is_valid_tests_ids:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Invalid test id')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Invalid test id')
 
     updated_template: Template = await crud_templates.update_template(template_id=template_id, template_in=template_in,
                                                                       db=db)
@@ -75,6 +75,13 @@ async def update_template(template_id: int, template_in: TemplateUpdate,
 @router.get('/tests', status_code=status.HTTP_200_OK, response_model=list[TemplateWithTests])
 async def get_template_tests(templates_ids: Annotated[list[int], Query()],
                              db: AsyncSession = Depends(get_db)) -> list[TemplateWithTests]:
+    for template_id in templates_ids:
+        is_valid: bool = await check_item_id_is_valid(crud=crud_templates, item_id=template_id, db=db)
+        if not is_valid:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f'Template with {template_id} id does not exist'
+                                )
+
     templates_with_tests: list[TemplateWithTests | None] = [None] * len(templates_ids)
     for i in range(len(templates_ids)):
         templates_with_tests[i] = TemplateWithTests(**{'id': templates_ids[i],
