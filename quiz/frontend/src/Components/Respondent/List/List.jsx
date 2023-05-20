@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import data from "../../../data";
 import "./List.css";
 import CookieLib from "../../../cookielib/index";
 import axios from "axios";
@@ -16,7 +15,6 @@ export default class List extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: new data(),
 			filter: "",
 			group: 1,
 			loading: true,
@@ -25,7 +23,7 @@ export default class List extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("localhost:8001/api/token/create_respondent")
+			.post("http://localhost:8001/api/token/create_respondent")
 			.then((x) => x.data)
 			.catch(() => {});
 		CookieLib.setCookieToken(token);
@@ -40,7 +38,7 @@ export default class List extends Component {
 				if (!token) token = await this.createToken();
 
 				let id = await axios
-					.get(`localhost:8001/api/token/${token}/id`)
+					.get(`http://localhost:8001/api/token/${token}/id`)
 					.then((x) => x.data);
 				if (!token) token = await this.createToken();
 
@@ -48,24 +46,31 @@ export default class List extends Component {
 			},
 			getQuizes: async () => {
 				let quizes = await axios
-					.get("localhost:8001/api/quizes", {
+					.get("http://localhost:8001/api/quizzes", {
 						params: {
 							respondent_id: this.state.id,
 							results: true,
 							template: true,
 						},
 					})
+					.then((x) => x.data)
 					.catch(() => {});
 
-				quizes = quizes.map(async (x) => ({
-					...quizes,
-					template: await axios
-						.get(`/templates/${x.template.id}`)
-						.then((x) => x.data),
-					results: await axios.get(`/results`, {
-						params: { quiz_id: x.quiz_id },
-					}),
-				}));
+				console.log(quizes);
+
+				quizes = Promise.all(
+					quizes.map(async (x) => ({
+						...quizes,
+						template: await axios
+							.get(`http://localhost:8001/api/templates/${x.template_id}`)
+							.then((x) => x.data),
+						results: await axios
+							.get(`http://localhost:8001/api/results/${x.id}`)
+							.then((x) => x.data),
+					}))
+				);
+
+				console.log(quizes);
 				// let quizes = [
 				// 	{
 				// 		name: "Квиз 1",

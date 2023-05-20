@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import data from "../../../data";
 import "./Quiz.css";
 import CookieLib from "../../../cookielib/index";
 import LoadingScreen from "react-loading-screen";
@@ -31,7 +30,6 @@ export default class Templates extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: new data(),
 			group: 1,
 			loading: true,
 			isModalOpen: false,
@@ -54,7 +52,7 @@ export default class Templates extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("localhost:8001/api/token/create_respondent")
+			.post("http://localhost:8001/api/token/create_respondent")
 			.then((x) => x.data)
 			.catch(() => {});
 		CookieLib.setCookieToken(token);
@@ -69,7 +67,7 @@ export default class Templates extends Component {
 				if (!token) token = await this.createToken();
 
 				let id = await axios
-					.get(`localhost:8001/api/token/${token}/id`)
+					.get(`http://localhost:8001/api/token/${token}/id`)
 					.then((x) => x.data);
 				if (!token) token = await this.createToken();
 
@@ -84,7 +82,7 @@ export default class Templates extends Component {
 			},
 			getQuiz: async () => {
 				let quiz = await axios
-					.get(`localhost:8001/api/quizes/${this.state.quiz_id}`, {
+					.get(`http://localhost:8001/api/quizes/${this.state.quiz_id}`, {
 						params: {
 							respondent_id: this.state.id,
 							results: true,
@@ -95,9 +93,9 @@ export default class Templates extends Component {
 				quiz = {
 					...quiz,
 					template: await axios
-						.get(`localhost:8001/api/templates/${quiz.template.id}`)
+						.get(`http://localhost:8001/api/templates/${quiz.template.id}`)
 						.then((x) => x.data),
-					results: await axios.get(`localhost:8001/api/results`, {
+					results: await axios.get(`http://localhost:8001/api/results`, {
 						params: { quiz_id: quiz.quiz_id },
 					}),
 				};

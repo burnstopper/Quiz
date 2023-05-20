@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import data from "../../../data";
 import "./Template.css";
 import CookieLib from "../../../cookielib/index";
 import axios from "axios";
@@ -21,7 +20,6 @@ export default class Templates extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: new data(),
 			filter: "",
 			group: 1,
 			loading: true,
@@ -33,7 +31,7 @@ export default class Templates extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("localhost:8001/api/token/create_respondent")
+			.post("http://localhost:8001/api/token/create_respondent")
 			.then((x) => x.data)
 			.catch(() => {});
 		CookieLib.setCookieToken(token);
@@ -48,7 +46,7 @@ export default class Templates extends Component {
 				if (!token) token = await this.createToken();
 
 				let id = await axios
-					.get(`localhost:8001/api/token/${token}/id`)
+					.get(`http://localhost:8001/api/token/${token}/id`)
 					.then((x) => x.data);
 				if (!token) token = await this.createToken();
 
@@ -57,7 +55,7 @@ export default class Templates extends Component {
 			checkPermission: async () => {
 				let check = await axios
 					.get(
-						`localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
+						`http://localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
 					)
 					.then((x) => x.data);
 				// let check = true;
@@ -65,7 +63,7 @@ export default class Templates extends Component {
 			},
 			getTemplates: async () => {
 				let templates = await axios
-					.get("localhost:8001/api/templates", {
+					.get("http://localhost:8001/api/templates", {
 						params: {
 							// respondent_id: this.state.id
 						},

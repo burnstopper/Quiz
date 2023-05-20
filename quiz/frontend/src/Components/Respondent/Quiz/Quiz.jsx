@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import data from "../../../data";
 import "./Quiz.css";
 import CookieLib from "../../../cookielib/index";
 import axios from "axios";
@@ -35,7 +34,6 @@ class Quiz extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: new data(),
 			quiz_id: this.props.params.quiz,
 			loading: true,
 		};
@@ -43,7 +41,7 @@ class Quiz extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("localhost:8001/api/token/create_respondent")
+			.post("http://localhost:8001/api/token/create_respondent")
 			.then((x) => x.data)
 			.catch(() => {});
 		CookieLib.setCookieToken(token);
@@ -58,7 +56,7 @@ class Quiz extends Component {
 				if (!token) token = await this.createToken();
 
 				let id = await axios
-					.get(`localhost:8001/api/token/${token}/id`)
+					.get(`http://localhost:8001/api/token/${token}/id`)
 					.then((x) => x.data);
 				if (!token) token = await this.createToken();
 
@@ -67,7 +65,7 @@ class Quiz extends Component {
 			checkPermission: async () => {
 				let check = await axios
 					.get(
-						`localhost:8001/api/quizes/${this.state.quiz_id}/respondent/${this.state.id}`
+						`http://localhost:8001/api/quizes/${this.state.quiz_id}/respondent/${this.state.id}`
 					)
 					.then((x) => x.data);
 				// let check = true;
@@ -75,7 +73,7 @@ class Quiz extends Component {
 			},
 			getQuiz: async () => {
 				let quiz = await axios
-					.get(`localhost:8001/api/quizes/${this.state.quiz_id}`, {
+					.get(`http://localhost:8001/api/quizes/${this.state.quiz_id}`, {
 						params: {
 							respondent_id: this.state.id,
 							results: true,
@@ -86,9 +84,9 @@ class Quiz extends Component {
 				quiz = {
 					...quiz,
 					template: await axios
-						.get(`localhost:8001/api/templates/${quiz.template.id}`)
+						.get(`http://localhost:8001/api/templates/${quiz.template.id}`)
 						.then((x) => x.data),
-					results: await axios.get(`localhost:8001/api/results`, {
+					results: await axios.get(`http://localhost:8001/api/results`, {
 						params: { quiz_id: quiz.quiz_id },
 					}),
 				};

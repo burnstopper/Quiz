@@ -30,6 +30,10 @@ root.render(
 				<Route path="/quizes" element={<Respondent id={id} />} />
 				<Route path="/quizes/:quiz" element={<Quiz id={id} />} />
 				<Route path="/quizes/create" element={<CreateQuiz id={id} />} />
+				<Route
+					path="/researcher/quizes/:quiz"
+					element={<CreateQuiz id={id} />}
+				/>
 				<Route path="/researcher/quizes" element={<List id={id} />} />
 				<Route path="/researcher/templates" element={<Templates id={id} />} />
 				<Route path="/templates/create" element={<CreateTemplate id={id} />} />

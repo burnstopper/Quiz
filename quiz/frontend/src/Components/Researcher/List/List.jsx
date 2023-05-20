@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import data from "../../../data";
 import "./List.css";
 import CookieLib from "../../../cookielib/index";
 import axios from "axios";
@@ -16,7 +15,6 @@ export default class List extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			data: new data(),
 			filter: "",
 			group: 1,
 			loading: true,
@@ -25,7 +23,7 @@ export default class List extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("localhost:8001/api/token/create_respondent")
+			.post("http://localhost:8001/api/token/create_respondent")
 			.then((x) => x.data)
 			.catch(() => {});
 		CookieLib.setCookieToken(token);
@@ -40,7 +38,7 @@ export default class List extends Component {
 				if (!token) token = await this.createToken();
 
 				let id = await axios
-					.get(`localhost:8001/api/token/${token}/id`)
+					.get(`http://localhost:8001/api/token/${token}/id`)
 					.then((x) => x.data);
 				if (!token) token = await this.createToken();
 
@@ -49,7 +47,7 @@ export default class List extends Component {
 			checkPermission: async () => {
 				let check = await axios
 					.get(
-						`localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
+						`http://localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
 					)
 					.then((x) => x.data);
 				// let check = true;
@@ -57,7 +55,7 @@ export default class List extends Component {
 			},
 			getQuizes: async () => {
 				let quizes = await axios
-					.get("localhost:8001/api/quizes", {
+					.get("http://localhost:8001/api/quizes", {
 						params: {
 							// respondent_id: this.state.id,
 							results: true,
@@ -69,9 +67,9 @@ export default class List extends Component {
 				quizes = quizes.map(async (x) => ({
 					...quizes,
 					template: await axios
-						.get(`localhost:8001/api/templates/${x.template.id}`)
+						.get(`http://localhost:8001/api/templates/${x.template.id}`)
 						.then((x) => x.data),
-					results: await axios.get(`localhost:8001/api/results`, {
+					results: await axios.get(`http://localhost:8001/api/results`, {
 						params: { quiz_id: x.quiz_id },
 					}),
 				}));
