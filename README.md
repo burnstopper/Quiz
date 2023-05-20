@@ -9,8 +9,7 @@
 - ```HOST``` — хост этого микросервиса для invite-ссылок на опрос
 - ```PORT``` — порт этого микросервиса для invite-ссылок на опрос
 
-- ```WORKERS_PER_CORE```
-- ```WEB_CONCURRENCY```
+
 - ```SQLALCHEMY_DATABASE_URL```="sqlite+aiosqlite:///app/storage/quizzes_databases.db" — путь к базе данных
 - ```BEARER_TOKEN``` — токен доступа к микросервису Пользователь
 - ```TOKEN_SERVICE_URL```="185.46.11.65:80" — ссылка на микросервис Пользователь
