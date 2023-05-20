@@ -10,14 +10,14 @@ from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 from app.database.base import *
 
-TEST_SQLALCHEMY_DATABASE_URI = "sqlite+aiosqlite:///tests/test_storage/test_quizzes_database.db"
-settings.SQLALCHEMY_DATABASE_URL = TEST_SQLALCHEMY_DATABASE_URI
+TEST_SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///tests/test_storage/test_quizzes_database.db"
+settings.SQLALCHEMY_DATABASE_URL = TEST_SQLALCHEMY_DATABASE_URL
 
 from app.database.dependencies import get_db
-from app.main import app
+from main import app
 
 # DATABASE
-engine_test = create_async_engine(TEST_SQLALCHEMY_DATABASE_URI, echo=False)
+engine_test = create_async_engine(TEST_SQLALCHEMY_DATABASE_URL, echo=False)
 async_session_maker = async_sessionmaker(bind=engine_test, expire_on_commit=False, class_=AsyncSession)
 
 
