@@ -14,7 +14,7 @@ TEST_SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///tests/test_storage/test_quiz
 settings.SQLALCHEMY_DATABASE_URL = TEST_SQLALCHEMY_DATABASE_URL
 
 from app.database.dependencies import get_db
-from main import app
+from app.main import app
 
 # DATABASE
 engine_test = create_async_engine(TEST_SQLALCHEMY_DATABASE_URL, echo=False)
