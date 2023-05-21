@@ -3,14 +3,13 @@ import "./Quiz.css";
 import CookieLib from "../../../cookielib/index";
 import LoadingScreen from "react-loading-screen";
 import { Spinner } from "react-bootstrap";
-import { Link, Navigate } from "react-router-dom";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
-import { Draggable, Droppable } from "react-drag-and-drop";
-import Dropdown from "react-bootstrap/Dropdown";
+import { useParams, Navigate } from "react-router-dom";
 import Accordion from "react-bootstrap/Accordion";
 import axios from "axios";
-let i = 0;
+
+function withParams(Component) {
+	return (props) => <Component {...props} params={useParams()} />;
+}
 function isBlank(str) {
 	return !str || /^\s*$/.test(str);
 }
@@ -26,135 +25,156 @@ function array_move(arr, old_index, new_index) {
 	return arr; // for testing
 }
 
-export default class Templates extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			group: 1,
-			loading: true,
-			isModalOpen: false,
-			title: "Опросы",
-			list: ["Пусто"],
-		};
-	}
-
-	handleDrop(data, index) {
-		let array = Array.from(this.state.template.tests_ids);
-		// let tmp = array[data.tests];
-		let result = array_move(array, data.tests, index);
-		// array[data.tests] = array[this.index];
-		// array[this.index] = tmp;
-		let template = this.state.template;
-		template.tests_ids = result;
-		this.setState({ template });
-		console.log(this.state.template);
-	}
-
-	async createToken() {
-		let token = await axios
-			.post("http://localhost:8001/api/token/create_respondent")
-			.then((x) => x.data)
-			.catch(() => {});
-		CookieLib.setCookieToken(token);
-		return token;
-	}
-
-	componentDidMount() {
-		let getData = {
-			getToken: async () => {
-				let token = CookieLib.getCookieToken();
-				// let id = "123213121";
-				if (!token) token = await this.createToken();
-
-				let id = await axios
-					.get(`http://localhost:8001/api/token/${token}/id`)
-					.then((x) => x.data);
-				if (!token) token = await this.createToken();
-
-				this.setState({ token, id });
-			},
-			checkPermission: async () => {
-				// let check = await axios
-				// 	.get(`/token/${this.state.quiz_id}/check_researcher`)
-				// 	.then((x) => x.data);
-				let check = true;
-				this.setState({ check });
-			},
-			getQuiz: async () => {
-				let quiz = await axios
-					.get(`http://localhost:8001/api/quizes/${this.state.quiz_id}`, {
-						params: {
-							respondent_id: this.state.id,
-							results: true,
-							template: true,
-						},
-					})
-					.catch(() => {});
-				quiz = {
-					...quiz,
-					template: await axios
-						.get(`http://localhost:8001/api/templates/${quiz.template.id}`)
-						.then((x) => x.data),
-					results: await axios.get(`http://localhost:8001/api/results`, {
-						params: { quiz_id: quiz.quiz_id },
-					}),
-				};
-				// let quiz = {
-				// 	name: "Квиз 2",
-				// 	description: "Опрос для БКНАД 211 и БКНАД 212, всем хорошего дня",
-				// 	template: { tests: [0, 3, 2] },
-				// 	results: [[{}], [{}], [{}], []],
-				// };
-
-				this.setState({ quiz });
-			},
-		};
-		async function start() {
-			for (let i of Object.keys(getData)) {
-				await getData[i]();
-			}
-			this.setState({ loading: false });
+export default withParams(
+	class Templates extends Component {
+		constructor(props) {
+			super(props);
+			this.state = {
+				group: 1,
+				quiz_id: this.props.params.quiz,
+				loading: true,
+				isModalOpen: false,
+				title: "Опросы",
+				list: ["Пусто"],
+			};
 		}
-		start.bind(this)();
-	}
 
-	render() {
-		return this.state.loading ? (
-			<>
-				<LoadingScreen
-					loading={true}
-					bgColor="#E7E2E2"
-					spinnerColor="#ff7f50"
-					textColor="#676767"
-				></LoadingScreen>
-				<Spinner animation="border" role="status">
-					<span className="sr-only">Loading...</span>
-				</Spinner>
-			</>
-		) : this.state.check ? (
-			<div className="parent">
-				<div class="container">
-					<Accordion id="accord-block" defaultActiveKey="0">
-						<Accordion.Item id="accord-item" eventKey="0">
-							<Accordion.Header>Название</Accordion.Header>
-							<Accordion.Body>
-								Кол-во участников <br /> Участник (63%) 1 <br /> Участник 2 (0%)
-							</Accordion.Body>
-						</Accordion.Item>
-					</Accordion>
-					<Accordion id="accord-block" defaultActiveKey="0">
-						<Accordion.Item id="accord-item" eventKey="0">
-							<Accordion.Header>Ссылка</Accordion.Header>
-							<Accordion.Body id="accord-text">
-								Кол-во участников <br /> Участник (63%) 1 <br /> Участник 2 (0%)
-							</Accordion.Body>
-						</Accordion.Item>
-					</Accordion>
+		handleDrop(data, index) {
+			let array = Array.from(this.state.template.tests_ids);
+			// let tmp = array[data.tests];
+			let result = array_move(array, data.tests, index);
+			// array[data.tests] = array[this.index];
+			// array[this.index] = tmp;
+			let template = this.state.template;
+			template.tests_ids = result;
+			this.setState({ template });
+			console.log(this.state.template);
+		}
+
+		async createToken() {
+			let token = await axios
+				.post("http://localhost:8001/api/token/create_respondent")
+				.then((x) => x.data)
+				.catch(() => {});
+			CookieLib.setCookieToken(token);
+			return token;
+		}
+
+		async checkPermissions() {
+			// let check = await axios
+			// 	.get(
+			// 		`http://localhost:8001/api/token/${this.state.token}/check_researcher`
+			// 	)
+			// 	.then((x) => x.data)
+			//  .catch(() => {});
+			let check = true;
+			this.setState({ check });
+		}
+
+		componentDidMount() {
+			let getData = {
+				getToken: async () => {
+					let token = CookieLib.getCookieToken();
+					// let id = "123213121";
+					if (!token || token === undefined || token === "undefined")
+						token = await this.createToken();
+
+					let id = await axios
+						.get(`http://localhost:8001/api/token/${token}/id`)
+						.then((x) => x.data);
+					if (!token) token = await this.createToken();
+
+					this.setState({ token, id }, this.checkPermissions);
+				},
+				checkPermission: async () => {
+					// let check = await axios
+					// 	.get(`/token/${this.state.quiz_id}/check_researcher`)
+					// 	.then((x) => x.data);
+					let check = true;
+					this.setState({ check });
+				},
+				getQuiz: async () => {
+					let quiz = await axios
+						.get(`http://localhost:8001/api/quizzes/${this.state.quiz_id}`, {
+							params: {
+								respondent_id: this.state.id,
+								results: true,
+								template: true,
+							},
+						})
+						.then((x) => x.data)
+						.catch(() => {});
+
+					console.log(quiz);
+					if (quiz)
+						quiz = {
+							...quiz,
+							template: await axios
+								.get(`http://localhost:8001/api/templates/${quiz.template_id}`)
+								.then((x) => x.data),
+							results: await axios
+								.get(`http://localhost:8001/api/results/${quiz.id}`)
+								.then((x) => x.data.tests_result),
+						};
+					// let quiz = {
+					// 	name: "Квиз 2",
+					// 	description: "Опрос для БКНАД 211 и БКНАД 212, всем хорошего дня",
+					// 	template: { tests: [0, 3, 2] },
+					// 	results: [[{}], [{}], [{}], []],
+					// };
+
+					this.setState({ quiz });
+				},
+			};
+			async function start() {
+				for (let i of Object.keys(getData)) {
+					await getData[i]();
+				}
+				this.setState({ loading: false });
+			}
+			start.bind(this)();
+		}
+
+		render() {
+			return this.state.loading ? (
+				<>
+					<LoadingScreen
+						loading={true}
+						bgColor="#E7E2E2"
+						spinnerColor="#ff7f50"
+						textColor="#676767"
+					></LoadingScreen>
+					<Spinner animation="border" role="status">
+						<span className="sr-only">Loading...</span>
+					</Spinner>
+				</>
+			) : this.state.check && this.state.quiz?.name ? (
+				<div className="parent">
+					<div className="container">
+						<Accordion id="accord-block" defaultActiveKey="0">
+							<Accordion.Item id="accord-item" eventKey="0">
+								<Accordion.Header>Название</Accordion.Header>
+								<Accordion.Body>
+									Кол-во участников <br /> Участник (63%) 1 <br /> Участник 2
+									(0%)
+								</Accordion.Body>
+							</Accordion.Item>
+						</Accordion>
+						<Accordion id="accord-block" defaultActiveKey="0">
+							<Accordion.Item id="accord-item" eventKey="0">
+								<Accordion.Header>Ссылка</Accordion.Header>
+								<Accordion.Body id="accord-text">
+									Кол-во участников <br /> Участник (63%) 1 <br /> Участник 2
+									(0%)
+								</Accordion.Body>
+							</Accordion.Item>
+						</Accordion>
+					</div>
+					<div className="calendar"></div>
 				</div>
-				<div className="calendar"></div>
-			</div>
-		) : (
-			<Navigate to="/quizes" replace={true} />
-		);
+			) : (
+				<Navigate to="/quizes" replace={true} />
+			);
+		}
 	}
-}
+);

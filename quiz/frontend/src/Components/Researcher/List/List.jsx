@@ -30,70 +30,51 @@ export default class List extends Component {
 		return token;
 	}
 
+	async checkPermissions() {
+		// let check = await axios
+		// 	.get(
+		// 		`http://localhost:8001/api/token/${this.state.token}/check_researcher`
+		// 	)
+		// 	.then((x) => x.data)
+		//  .catch(() => {});
+		let check = true;
+		this.setState({ check });
+	}
+
 	componentDidMount() {
 		let getData = {
 			getToken: async () => {
 				let token = CookieLib.getCookieToken();
-				// let id = "123213121";
-				if (!token) token = await this.createToken();
+				if (!token || token === undefined || token === "undefined")
+					token = await this.createToken();
 
 				let id = await axios
 					.get(`http://localhost:8001/api/token/${token}/id`)
-					.then((x) => x.data);
+					.then((x) => x.data.respondent_id)
+					.catch(() => {});
 				if (!token) token = await this.createToken();
 
-				this.setState({ token, id });
-			},
-			checkPermission: async () => {
-				let check = await axios
-					.get(
-						`http://localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
-					)
-					.then((x) => x.data);
-				// let check = true;
-				this.setState({ check });
+				this.setState({ token, id }, this.checkPermissions);
 			},
 			getQuizes: async () => {
 				let quizes = await axios
-					.get("http://localhost:8001/api/quizes", {
-						params: {
-							// respondent_id: this.state.id,
-							results: true,
-							template: true,
-						},
-					})
+					.get("http://localhost:8001/api/quizzes/")
+					.then((x) => x.data)
 					.catch(() => {});
 
-				quizes = quizes.map(async (x) => ({
-					...quizes,
-					template: await axios
-						.get(`http://localhost:8001/api/templates/${x.template.id}`)
-						.then((x) => x.data),
-					results: await axios.get(`http://localhost:8001/api/results`, {
-						params: { quiz_id: x.quiz_id },
-					}),
-				}));
-				// let quizes = [
-				// 	{
-				// 		name: "Квиз 1",
-				// 		id: 1,
-				// 		results: [[], [{}], [{}], []],
-				// 		template: { tests: [1, 2, 3] },
-				// 	},
-				// 	{
-				// 		name: "Квиз 2",
-				// 		id: 2,
-				// 		results: [[], [{}], [{}], []],
-				// 		template: { tests: [2, 3] },
-				// 	},
-				// 	{
-				// 		name: "Квиз 3",
-				// 		id: 3,
-				// 		results: [[{}], [{}], [{}], [{}]],
-				// 		template: { tests: [0, 2, 3] },
-				// 	},
-				// ];
-				// console.log(quizes);
+				quizes = await Promise.all(
+					quizes.map(async (x) => ({
+						...x,
+						template: await axios
+							.get(`http://localhost:8001/api/templates/${x.template_id}`)
+							.then((y) => y.data),
+						results: await axios
+							.get(`http://localhost:8001/api/results/${x.id}`)
+							.then((y) => y.data.tests_result),
+					}))
+				);
+
+				console.log(quizes);
 
 				this.setState({ quizes, filtered: quizes });
 			},

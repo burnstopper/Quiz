@@ -32,34 +32,38 @@ export default class Templates extends Component {
 	async createToken() {
 		let token = await axios
 			.post("http://localhost:8001/api/token/create_respondent")
-			.then((x) => x.data)
-			.catch(() => {});
+			.then((x) => x.data.respondent_token)
+			.catch(console.log);
 		CookieLib.setCookieToken(token);
 		return token;
+	}
+
+	async checkPermissions() {
+		// let check = await axios
+		// 	.get(
+		// 		`http://localhost:8001/api/token/${this.state.token}/check_researcher`
+		// 	)
+		// 	.then((x) => x.data)
+		//  .catch(() => {});
+		let check = true;
+		this.setState({ check });
 	}
 
 	componentDidMount() {
 		let getData = {
 			getToken: async () => {
 				let token = CookieLib.getCookieToken();
-				// let id = "123213121";
-				if (!token) token = await this.createToken();
+				if (!token || token === undefined || token === "undefined")
+					token = await this.createToken();
 
 				let id = await axios
 					.get(`http://localhost:8001/api/token/${token}/id`)
-					.then((x) => x.data);
-				if (!token) token = await this.createToken();
+					.then((x) => x.data.respondent_id)
+					.catch(() => {});
 
-				this.setState({ token, id });
-			},
-			checkPermission: async () => {
-				let check = await axios
-					.get(
-						`http://localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
-					)
-					.then((x) => x.data);
-				// let check = true;
-				this.setState({ check });
+				if (!id) token = await this.createToken();
+
+				this.setState({ token, id }, this.checkPermissions);
 			},
 			getTemplates: async () => {
 				let templates = await axios
@@ -68,6 +72,7 @@ export default class Templates extends Component {
 							// respondent_id: this.state.id
 						},
 					})
+					.then((x) => x.data)
 					.catch(() => {});
 
 				// quizes = quizes.map(async (x) => ({
@@ -206,7 +211,7 @@ export default class Templates extends Component {
 											this.setState({
 												isModalOpen: true,
 												title: "Тесты",
-												list: x.tests_ids,
+												list: x.tests.map((x) => x.name),
 											})
 										}
 										id="quizBtnComponent"
@@ -229,7 +234,7 @@ export default class Templates extends Component {
 									</button>{" "}
 									{/* </div> */}
 									<button
-										onClick={() => (window.location.href += `/${x.id}`)}
+										onClick={() => (window.location.href = `/quizes/create`)}
 										id="quizBtnComponent"
 									>
 										Создать опрос

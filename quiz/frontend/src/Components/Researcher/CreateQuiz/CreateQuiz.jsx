@@ -52,7 +52,6 @@ class Quiz extends Component {
 			.then((x) => x.data)
 			.catch(() => {});
 
-		console.log(quiz);
 		if (quiz)
 			this.setState({
 				name: quiz.name,
@@ -71,9 +70,9 @@ class Quiz extends Component {
 
 				let id = await axios
 					.get(`http://localhost:8001/api/token/${token}/id`)
-					.then((x) => x.data)
+					.then((x) => x.data.respondent_id)
 					.catch(() => {});
-				if (!token) token = await this.createToken();
+				if (!id) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
 			},
@@ -98,7 +97,6 @@ class Quiz extends Component {
 	}
 
 	async submit() {
-		console.log(this.state);
 		let unchecked = Object.keys(names).filter(
 			(x) => !this.state[x] || this.state[x] === ""
 		);

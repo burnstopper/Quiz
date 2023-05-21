@@ -7,25 +7,6 @@ import { Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useParams, Navigate } from "react-router-dom";
 
-const tests = [
-	{
-		name: "Какой-то там первый",
-		link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-	},
-	{
-		name: "Второй",
-		link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-	},
-	{
-		name: "Третий",
-		link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-	},
-	{
-		name: "Четвертый",
-		link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-	},
-];
-
 function withParams(Component) {
 	return (props) => <Component {...props} params={useParams()} />;
 }
@@ -42,62 +23,78 @@ class Quiz extends Component {
 	async createToken() {
 		let token = await axios
 			.post("http://localhost:8001/api/token/create_respondent")
-			.then((x) => x.data)
-			.catch(() => {});
+			.then((x) => x.data.respondent_token)
+			.catch(console.log);
 		CookieLib.setCookieToken(token);
 		return token;
+	}
+
+	async checkPermission() {
+		let check = await axios
+			.get(
+				`http://localhost:8001/api/quizzes/${this.state.quiz_id}/check_access`,
+				{
+					params: {
+						respondent_id: this.state.id,
+					},
+				}
+			)
+			.then((x) => x.data);
+		console.log(check.has_access);
+		// let check = true;
+		this.setState({ check });
 	}
 
 	componentDidMount() {
 		let getData = {
 			getToken: async () => {
 				let token = CookieLib.getCookieToken();
-				// let id = "123213121";
-				if (!token) token = await this.createToken();
+				if (!token || token === undefined || token === "undefined")
+					token = await this.createToken();
 
 				let id = await axios
 					.get(`http://localhost:8001/api/token/${token}/id`)
-					.then((x) => x.data);
-				if (!token) token = await this.createToken();
+					.then((x) => x.data.respondent_id)
+					.catch(() => {});
 
-				this.setState({ token, id });
+				if (!id) token = await this.createToken();
+
+				this.setState({ token, id }, this.checkPermission);
 			},
-			checkPermission: async () => {
-				let check = await axios
-					.get(
-						`http://localhost:8001/api/quizes/${this.state.quiz_id}/respondent/${this.state.id}`
-					)
-					.then((x) => x.data);
-				// let check = true;
-				this.setState({ check });
-			},
+
 			getQuiz: async () => {
 				let quiz = await axios
-					.get(`http://localhost:8001/api/quizes/${this.state.quiz_id}`, {
+					.get(`http://localhost:8001/api/quizzes/${this.state.quiz_id}`, {
 						params: {
 							respondent_id: this.state.id,
 							results: true,
 							template: true,
 						},
 					})
+					.then((x) => x.data)
 					.catch(() => {});
+
 				quiz = {
 					...quiz,
 					template: await axios
-						.get(`http://localhost:8001/api/templates/${quiz.template.id}`)
+						.get(`http://localhost:8001/api/templates/${quiz.template_id}`)
 						.then((x) => x.data),
-					results: await axios.get(`http://localhost:8001/api/results`, {
-						params: { quiz_id: quiz.quiz_id },
-					}),
+					results: await axios
+						.get(`http://localhost:8001/api/results/${quiz.id}`)
+						.then((x) => x.data.tests_result),
 				};
-				// let quiz = {
-				// 	name: "Квиз 2",
-				// 	description: "Опрос для БКНАД 211 и БКНАД 212, всем хорошего дня",
-				// 	template: { tests: [0, 3, 2] },
-				// 	results: [[{}], [{}], [{}], []],
-				// };
 
 				this.setState({ quiz });
+			},
+			getTests: async () => {
+				let tests = await axios
+					.get(`http://localhost:8001/api/tests`)
+					.then((x) => x.data)
+					.catch(() => {});
+
+				console.log(tests);
+
+				this.setState({ tests });
 			},
 		};
 		async function start() {
@@ -130,10 +127,10 @@ class Quiz extends Component {
 				</div>
 
 				<div id="btnTile">
-					{this.state.quiz.template.tests_ids.map((x, i) => {
+					{this.state.quiz.template.tests.map((x, i) => {
 						console.log(this.state.quiz.results[x]?.length);
 						if (
-							this.state.quiz.results[this.state.quiz.template.tests_ids[i - 1]]
+							this.state.quiz.results[this.state.quiz.template.tests[i - 1]]
 								?.length > 0 ||
 							i === 0
 						)
@@ -141,20 +138,24 @@ class Quiz extends Component {
 								<Link
 									id="btnQuiz"
 									style={{ textDecoration: "none" }}
-									to={`${tests[x].link}`}
+									to={`${this.state.tests[x.id].url}`}
 									key={i}
 								>
-									<a id="titleTile">{tests[x].name}</a>
-									<span class="icon">
-										{this.state.quiz.results[x]?.length > 0 ? "✔️" : "⏱️"}
-									</span>
+									<div className="btnQuizComponents">
+										<a id="titleTiles">{this.state.tests[x.id].name}</a>
+										<span className="icon">
+											{this.state.quiz.results[x]?.length > 0 ? "✔️" : "⏱️"}
+										</span>
+									</div>
 								</Link>
 							);
 						else
 							return (
 								<div id="btnQuizDis" key={i}>
-									<a id="titleTile">{tests[x].name}</a>
-									<span class="icon">🔒</span>
+									<div className="btnQuizComponents" styles={{ width: "80%" }}>
+										<a id="titleTiles">{this.state.tests[x.id].name}</a>
+										<span class="icon">🔒</span>
+									</div>
 								</div>
 							);
 					})}

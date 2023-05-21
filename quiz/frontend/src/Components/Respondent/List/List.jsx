@@ -24,8 +24,8 @@ export default class List extends Component {
 	async createToken() {
 		let token = await axios
 			.post("http://localhost:8001/api/token/create_respondent")
-			.then((x) => x.data)
-			.catch(() => {});
+			.then((x) => x.data.respondent_token)
+			.catch(console.log);
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -34,13 +34,14 @@ export default class List extends Component {
 		let getData = {
 			getToken: async () => {
 				let token = CookieLib.getCookieToken();
-				// let id = "123213121";
-				if (!token) token = await this.createToken();
+				if (!token || token === undefined || token === "undefined")
+					token = await this.createToken();
 
 				let id = await axios
 					.get(`http://localhost:8001/api/token/${token}/id`)
-					.then((x) => x.data);
-				if (!token) token = await this.createToken();
+					.then((x) => x.data.respondent_id)
+					.catch(() => {});
+				if (!id) token = await this.createToken();
 
 				this.setState({ token, id });
 			},
@@ -49,49 +50,22 @@ export default class List extends Component {
 					.get("http://localhost:8001/api/quizzes", {
 						params: {
 							respondent_id: this.state.id,
-							results: true,
-							template: true,
 						},
 					})
 					.then((x) => x.data)
 					.catch(() => {});
 
-				console.log(quizes);
-
-				quizes = Promise.all(
+				quizes = await Promise.all(
 					quizes.map(async (x) => ({
-						...quizes,
+						...x,
 						template: await axios
 							.get(`http://localhost:8001/api/templates/${x.template_id}`)
-							.then((x) => x.data),
+							.then((y) => y.data),
 						results: await axios
 							.get(`http://localhost:8001/api/results/${x.id}`)
-							.then((x) => x.data),
+							.then((y) => y.data.tests_result),
 					}))
 				);
-
-				console.log(quizes);
-				// let quizes = [
-				// 	{
-				// 		name: "Квиз 1",
-				// 		id: 1,
-				// 		results: [[], [{}], [{}], []],
-				// 		template: { tests: [1, 2, 3] },
-				// 	},
-				// 	{
-				// 		name: "Квиз 2",
-				// 		id: 2,
-				// 		results: [[], [{}], [{}], []],
-				// 		template: { tests: [2, 3] },
-				// 	},
-				// 	{
-				// 		name: "Квиз 3",
-				// 		id: 3,
-				// 		results: [[{}], [{}], [{}], [{}]],
-				// 		template: { tests: [0, 2, 3] },
-				// 	},
-				// ];
-				// console.log(quizes);
 
 				this.setState({ quizes, filtered: quizes });
 			},
@@ -141,7 +115,7 @@ export default class List extends Component {
 							<Link
 								id="btnQuiz"
 								style={{ textDecoration: "none" }}
-								to={`${x.quiz_id}`}
+								to={`${x.id}`}
 								key={i}
 							>
 								<a id="titleTile">{x.name}</a>
@@ -149,10 +123,10 @@ export default class List extends Component {
 									{Math.round(
 										(x.results.filter(
 											(y) =>
-												x.template.tests_ids.includes(x.results.indexOf(y)) &&
+												x.template.tests.includes(x.results.indexOf(y)) &&
 												y.length > 0
 										).length /
-											x.template.tests_ids.length) *
+											x.template.tests.length) *
 											100
 									)}
 									%
@@ -160,20 +134,6 @@ export default class List extends Component {
 							</Link>
 						))}
 				</div>
-				{/* <div id="DownPagination">
-					<div className="pagination">
-						<a href="#">&#10094;</a>
-						<a className="active" href="#">
-							1
-						</a>
-						<a href="#">2</a>
-						<a href="#">3</a>
-						<a href="#">4</a>
-						<a href="#">5</a>
-						<a href="#">6</a>
-						<a href="#">&#10095;</a>
-					</div>
-				</div> */}
 			</div>
 		);
 	}

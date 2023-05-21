@@ -35,17 +35,29 @@ export default class Templates extends Component {
 			isModalOpen: false,
 			title: "Опросы",
 			list: ["Пусто"],
+			// name: '',
 		};
 	}
 
+	handleMenu(data, index) {
+		let template = this.state.template;
+		let element = this.state.tests.filter(
+			(x) => !template.tests.find((y) => y.id === x.id)
+		)[index];
+		template.tests.push(element);
+
+		this.setState({ template });
+		console.log(this.state.template);
+	}
+
 	handleDrop(data, index) {
-		let array = Array.from(this.state.template.tests_ids);
+		let array = Array.from(this.state.template.tests);
 		// let tmp = array[data.tests];
 		let result = array_move(array, data.tests, index);
 		// array[data.tests] = array[this.index];
 		// array[this.index] = tmp;
 		let template = this.state.template;
-		template.tests_ids = result;
+		template.tests = result;
 		this.setState({ template });
 		console.log(this.state.template);
 	}
@@ -59,41 +71,74 @@ export default class Templates extends Component {
 		return token;
 	}
 
+	async checkPermissions() {
+		// let check = await axios
+		// 	.get(
+		// 		`http://localhost:8001/api/token/${this.state.token}/check_researcher`
+		// 	)
+		// 	.then((x) => x.data)
+		//  .catch(() => {});
+		let check = true;
+		this.setState({ check });
+	}
+
+	async delete(index) {
+		let array = Array.from(this.state.template.tests);
+		array.splice(index, 1);
+		// let tmp = array[data.tests];
+		// array[data.tests] = array[this.index];
+		// array[this.index] = tmp;
+		let template = this.state.template;
+		template.tests = array;
+		this.setState({ template });
+		console.log(this.state.template);
+	}
+
 	componentDidMount() {
 		let getData = {
 			getToken: async () => {
 				let token = CookieLib.getCookieToken();
 				// let id = "123213121";
-				if (!token) token = await this.createToken();
+				if (!token || token === undefined || token === "undefined")
+					token = await this.createToken();
 
 				let id = await axios
 					.get(`http://localhost:8001/api/token/${token}/id`)
 					.then((x) => x.data);
 				if (!token) token = await this.createToken();
 
-				this.setState({ token, id });
+				this.setState({ token, id }, this.checkPermissions);
 			},
-			checkPermission: async () => {
-				let check = await axios
-					.get(
-						`http://localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
-					)
-					.then((x) => x.data);
-				// let check = true;
-				this.setState({ check });
-			},
+			// checkPermission: async () => {
+			// 	let check = await axios
+			// 		.get(
+			// 			`http://localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
+			// 		)
+			// 		.then((x) => x.data);
+			// 	// let check = true;
+			// 	this.setState({ check });
+			// },
 			getQuizes: async () => {
-				let template = await axios
-					.get(
-						`http://localhost:8001/api/templates/${this.state.template_id}`,
-						{
-							params: {
-								// respondent_id: this.state.id
-							},
-						}
-					)
-					.then((x) => x.data)
-					.catch(() => {});
+				let template;
+				if (this.state.template_id)
+					template = await axios
+						.get(
+							`http://localhost:8001/api/templates/${this.state.template_id}`,
+							{
+								params: {
+									// respondent_id: this.state.id
+								},
+							}
+						)
+						.then((x) => x.data)
+						.catch(() => {});
+				else {
+					template = {
+						name: "",
+						tests: [],
+						quizzes: [],
+					};
+				}
 
 				// quizes = quizes.map(async (x) => ({
 				// 	...quizes,
@@ -122,7 +167,7 @@ export default class Templates extends Component {
 			},
 			getAllQuizes: async () => {
 				let tests = await axios
-					.get(`/api/tests`)
+					.get(`http://localhost:8001/api/tests`)
 					.then((x) => x.data)
 					.catch(() => {});
 				// let tests = [
@@ -144,6 +189,22 @@ export default class Templates extends Component {
 			this.setState({ loading: false });
 		}
 		start.bind(this)();
+	}
+
+	async submit() {
+		console.log(this.state);
+		if (!this.state.name || this.state.name === "")
+			return alert("Вы не ввели название");
+
+		if (this.state.template?.tests?.length <= 0)
+			return alert("Список тестов не может быть пустым");
+
+		let data = await axios.post(
+			`http://localhost:8001/api/templates`,
+			this.state.template
+		);
+		if (data.status === 200) this.props.history.push(`/researcher/templates`);
+		else alert(data.statusText);
 	}
 
 	render() {
@@ -195,7 +256,7 @@ export default class Templates extends Component {
 
 				<div id="upTile">
 					<p id="text">Создание шаблона</p>
-					<div className="component-menu">
+					{/* <div className="component-menu">
 						<Dropdown>
 							<Dropdown.Toggle variant="success" id="dropdown-basic1">
 								Добавить тест
@@ -203,18 +264,23 @@ export default class Templates extends Component {
 
 							<Dropdown.Menu>
 								{this.state.tests
-									.filter((x) => !this.state.template.tests_ids.includes(x.id))
+									.filter(
+										(x) => !this.state.template.tests.find((y) => y.id === x.id)
+									)
 									.map((x, i) => (
-										<Dropdown.Item key={x} onClick={this.handleMenu}>
+										<Dropdown.Item
+											key={i}
+											onClick={(data) => this.handleMenu.bind(this)(data, i)}
+										>
 											<a id="titleTile">{x.name}</a>
 										</Dropdown.Item>
 									))}
 							</Dropdown.Menu>
 						</Dropdown>
-					</div>
+					</div> */}
 				</div>
-				<div id="btnTile">
-					{this.state.template.tests_ids.map((x, i) => (
+				{/* <div id="btnTile">
+					{this.state.template.tests.map((x, i) => (
 						<Droppable
 							id="btnQuizes"
 							// styles={{ maxWidth: "1200px", minWidth: "900px", width: "80%" }}
@@ -223,13 +289,11 @@ export default class Templates extends Component {
 							onDrop={(data) => this.handleDrop.bind(this)(data, i)}
 						>
 							<Draggable id="draggable" type="tests" data={i}>
-								<a id="titleTile">
-									{this.state.tests.find((y) => y.id == x).name}
-								</a>
+								<a id="titleTile">{x.name}</a>
 							</Draggable>
 						</Droppable>
 					))}
-				</div>
+				</div> */}
 				{/* <div id="DownPagination">
         <div className="pagination">
           <a href="#">&#10094;</a>
@@ -244,6 +308,61 @@ export default class Templates extends Component {
           <a href="#">&#10095;</a>
         </div>
       </div> */}
+				<div id="quizTile">
+					<div id="createQuizTile1" className="row">
+						<a id="quizText">Название опроса</a>
+						<input
+							id="search"
+							value={this.state.name || ""}
+							onChange={(e) => this.setState({ name: e.target.value })}
+							type="text"
+							placeholder="Write something.."
+						/>
+					</div>
+					<Dropdown>
+						<Dropdown.Toggle variant="success" id="dropdown-basic1">
+							Добавить тест
+						</Dropdown.Toggle>
+
+						<Dropdown.Menu>
+							{this.state.tests
+								.filter(
+									(x) => !this.state.template.tests.find((y) => y.id === x.id)
+								)
+								.map((x, i) => (
+									<Dropdown.Item
+										key={i}
+										onClick={(data) => this.handleMenu.bind(this)(data, i)}
+									>
+										<a id="titleTile">{x.name}</a>
+									</Dropdown.Item>
+								))}
+						</Dropdown.Menu>
+					</Dropdown>
+				</div>
+				<div id="btnTile">
+					{this.state.template.tests.map((x, i) => (
+						<Droppable
+							id="btnQuizes"
+							// styles={{ maxWidth: "1200px", minWidth: "900px", width: "80%" }}
+							key={i}
+							types={["tests"]}
+							onDrop={(data) => this.handleDrop.bind(this)(data, i)}
+						>
+							<Draggable id="draggable" type="tests" data={i}>
+								<a onClick={() => this.delete(i)} id="titleDelete">
+									❌
+								</a>
+								<a id="titleTile">{x.name}</a>
+							</Draggable>
+						</Droppable>
+					))}
+				</div>
+				<div id="downTiles">
+					<button id="btnPlayss" onClick={() => {}}>
+						Создать
+					</button>
+				</div>
 			</div>
 		) : (
 			<Navigate to="/quizes" replace={true} />
