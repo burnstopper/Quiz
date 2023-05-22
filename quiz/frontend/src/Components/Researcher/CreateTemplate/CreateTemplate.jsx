@@ -193,7 +193,10 @@ export default class Templates extends Component {
 		if (this.state.template?.tests?.length <= 0)
 			return alert("Список тестов не может быть пустым");
 
-		let data = await axios.post(`/api/templates`, this.state.template);
+		let data = await axios.post(`/api/templates`, {
+			tests: this.state.template.tests,
+			name: this.state.name,
+		});
 		if (data.status === 200) this.props.history.push(`/researcher/templates`);
 		else alert(data.statusText);
 	}
