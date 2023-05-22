@@ -35,6 +35,7 @@ export default class Templates extends Component {
 			isModalOpen: false,
 			title: "Опросы",
 			list: ["Пусто"],
+			edit: false,
 			// name: '',
 		};
 	}
@@ -47,7 +48,6 @@ export default class Templates extends Component {
 		template.tests.push(element);
 
 		this.setState({ template });
-		console.log(this.state.template);
 	}
 
 	handleDrop(data, index) {
@@ -59,14 +59,13 @@ export default class Templates extends Component {
 		let template = this.state.template;
 		template.tests = result;
 		this.setState({ template });
-		console.log(this.state.template);
 	}
 
 	async createToken() {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data)
-			.catch(() => {});
+			.catch((e) => alert(e.response.data));
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -77,7 +76,7 @@ export default class Templates extends Component {
 		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
-		//  .catch(() => {});
+		//  .catch((e) => alert(e.response.data));
 		let check = true;
 		this.setState({ check });
 	}
@@ -91,9 +90,21 @@ export default class Templates extends Component {
 		let template = this.state.template;
 		template.tests = array;
 		this.setState({ template });
-		console.log(this.state.template);
 	}
 
+	async getTemplateData() {
+		let template = await axios
+			.get(`/api/templates/${this.state.quiz_id}`)
+			.then((x) => x.data)
+			.catch((e) => alert(e.response.data));
+
+		if (template)
+			this.setState({
+				name: template.name,
+				template,
+				edit: true,
+			});
+	}
 	componentDidMount() {
 		let getData = {
 			getToken: async () => {
@@ -102,7 +113,10 @@ export default class Templates extends Component {
 				if (!token || token === undefined || token === "undefined")
 					token = await this.createToken();
 
-				let id = await axios.get(`/api/token/${token}/id`).then((x) => x.data);
+				let id = await axios
+					.get(`/api/token/${token}/id`)
+					.then((x) => x.data)
+					.catch((e) => alert(e.response.data));
 				if (!token) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
@@ -112,7 +126,7 @@ export default class Templates extends Component {
 			// 		.get(
 			// 			`/api/token/${this.state.quiz_id}/check_researcher`
 			// 		)
-			// 		.then((x) => x.data);
+			// 		.then((x) => x.data).catch((e) => alert(e.response.data));
 			// 	// let check = true;
 			// 	this.setState({ check });
 			// },
@@ -126,7 +140,7 @@ export default class Templates extends Component {
 							},
 						})
 						.then((x) => x.data)
-						.catch(() => {});
+						.catch((e) => alert(e.response.data));
 				else {
 					template = {
 						name: "",
@@ -164,7 +178,7 @@ export default class Templates extends Component {
 				let tests = await axios
 					.get(`/api/tests`)
 					.then((x) => x.data)
-					.catch(() => {});
+					.catch((e) => alert(e.response.data));
 				// let tests = [
 				// 	{ id: 1, name: "Что-то первое" },
 				// 	{ id: 2, name: "Что-то второе" },
@@ -181,6 +195,9 @@ export default class Templates extends Component {
 			for (let i of Object.keys(getData)) {
 				await getData[i]();
 			}
+
+			if (this.state.template_id) await this.getTemplateData();
+
 			this.setState({ loading: false });
 		}
 		start.bind(this)();
@@ -193,10 +210,12 @@ export default class Templates extends Component {
 		if (this.state.template?.tests?.length <= 0)
 			return alert("Список тестов не может быть пустым");
 
-		let data = await axios.post(`/api/templates`, {
-			tests_ids: this.state.template.tests.map((x) => x.id),
-			name: this.state.name,
-		});
+		let data = await axios
+			.post(`/api/templates`, {
+				tests_ids: this.state.template.tests.map((x) => x.id),
+				name: this.state.name,
+			})
+			.catch((e) => alert(e.response.data));
 		if (data.status === 200) this.props.history.push(`/researcher/templates`);
 		else alert(data.statusText);
 	}
@@ -249,7 +268,9 @@ export default class Templates extends Component {
 				</Modal>
 
 				<div id="upTile">
-					<p id="text">Создание шаблона</p>
+					<p id="text">
+						{this.state.edit ? "Редактирование" : "Создание"} шаблона
+					</p>
 					{/* <div className="component-menu">
 						<Dropdown>
 							<Dropdown.Toggle variant="success" id="dropdown-basic1">

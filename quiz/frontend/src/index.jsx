@@ -14,6 +14,7 @@ import List from "./Components/Researcher/List/List";
 import Templates from "./Components/Researcher/Templates/Template";
 import CreateTemplate from "./Components/Researcher/CreateTemplate/CreateTemplate";
 import QuizResearch from "./Components/Researcher/Quiz/Quiz";
+import Redirect from "./Components/Redirect";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 let id = Math.floor(Math.random() * 1000000 + 10000000);
@@ -37,7 +38,10 @@ root.render(
 			<Routes>
 				<Route path="/quizes" element={<Respondent id={id} />} />
 				<Route path="/quizes/:quiz" element={<Quiz id={id} />} />
-				<Route path="/quizes/create" element={<CreateQuiz id={id} />} />
+				<Route
+					path="/researcher/quizes/create"
+					element={<CreateQuiz id={id} />}
+				/>
 				<Route
 					path="/researcher/quizes/:quiz/edit"
 					element={<CreateQuiz id={id} />}
@@ -45,18 +49,18 @@ root.render(
 				<Route path="/researcher/quizes" element={<List id={id} />} />
 				<Route path="/researcher/templates" element={<Templates id={id} />} />
 				<Route
-					path="/researcher/templates/:template"
-					element={<Templates id={id} />}
+					path="/researcher/templates/create"
+					element={<CreateTemplate id={id} />}
 				/>
-				<Route path="/templates/create" element={<CreateTemplate id={id} />} />
 				<Route
-					path="/templates/:template"
+					path="/researcher/templates/:template"
 					element={<CreateTemplate id={id} />}
 				/>
 				<Route
 					path="/researcher/quizes/:quiz"
 					element={<QuizResearch id={id} />}
 				/>
+				<Route path="*" element={<Redirect />} />
 			</Routes>
 		</div>
 	</Router>

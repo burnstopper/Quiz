@@ -25,7 +25,7 @@ export default class List extends Component {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
-			.catch(console.log);
+			.catch((e) => alert(e.response.data));
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -40,7 +40,7 @@ export default class List extends Component {
 				let id = await axios
 					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
-					.catch(() => {});
+					.catch((e) => alert(e.response.data));
 				if (!id) token = await this.createToken();
 
 				this.setState({ token, id });
@@ -53,7 +53,7 @@ export default class List extends Component {
 						},
 					})
 					.then((x) => x.data)
-					.catch(() => {});
+					.catch((e) => alert(e.response.data));
 
 				if (quizes)
 					quizes = await Promise.all(
@@ -61,10 +61,12 @@ export default class List extends Component {
 							...x,
 							template: await axios
 								.get(`/api/templates/${x.template_id}`)
-								.then((y) => y.data),
+								.then((y) => y.data)
+								.catch((e) => alert(e.response.data)),
 							results: await axios
 								.get(`/api/results/${x.id}`)
-								.then((y) => y.data.tests_result),
+								.then((y) => y.data.tests_result)
+								.catch((e) => alert(e.response.data)),
 						}))
 					);
 

@@ -48,14 +48,13 @@ export default withParams(
 			let template = this.state.template;
 			template.tests_ids = result;
 			this.setState({ template });
-			console.log(this.state.template);
 		}
 
 		async createToken() {
 			let token = await axios
 				.post("/api/token/create_respondent")
 				.then((x) => x.data)
-				.catch(() => {});
+				.catch((e) => alert(e.response.data));
 			CookieLib.setCookieToken(token);
 			return token;
 		}
@@ -66,7 +65,7 @@ export default withParams(
 			// 		`/api/token/${this.state.token}/check_researcher`
 			// 	)
 			// 	.then((x) => x.data)
-			//  .catch(() => {});
+			//  .catch((e) => alert(e.response.data));
 			let check = true;
 			this.setState({ check });
 		}
@@ -81,7 +80,8 @@ export default withParams(
 
 					let id = await axios
 						.get(`/api/token/${token}/id`)
-						.then((x) => x.data);
+						.then((x) => x.data)
+						.catch((e) => alert(e.response.data));
 					if (!token) token = await this.createToken();
 
 					this.setState({ token, id }, this.checkPermissions);
@@ -89,7 +89,7 @@ export default withParams(
 				checkPermission: async () => {
 					// let check = await axios
 					// 	.get(`/token/${this.state.quiz_id}/check_researcher`)
-					// 	.then((x) => x.data);
+					// 	.then((x) => x.data).catch((e) => alert(e.response.data));
 					let check = true;
 					this.setState({ check });
 				},
@@ -101,17 +101,19 @@ export default withParams(
 							},
 						})
 						.then((x) => x.data)
-						.catch(() => {});
+						.catch((e) => alert(e.response.data));
 
 					if (quiz)
 						quiz = {
 							...quiz,
 							template: await axios
 								.get(`/api/templates/${quiz.template_id}`)
-								.then((x) => x.data),
+								.then((x) => x.data)
+								.catch((e) => alert(e.response.data)),
 							results: await axios
 								.get(`/api/results/${quiz.id}`)
-								.then((x) => x.data.tests_result),
+								.then((x) => x.data.tests_result)
+								.catch((e) => alert(e.response.data)),
 						};
 					// let quiz = {
 					// 	name: "Квиз 2",

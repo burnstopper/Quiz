@@ -30,7 +30,7 @@ class Quiz extends Component {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
-			.catch(console.log);
+			.catch((e) => alert(e.response.data));
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -41,7 +41,7 @@ class Quiz extends Component {
 		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
-		//  .catch(() => {});
+		//  .catch((e) => alert(e.response.data));
 		let check = true;
 		this.setState({ check });
 	}
@@ -50,7 +50,7 @@ class Quiz extends Component {
 		let quiz = await axios
 			.get(`/api/quizzes/${this.state.quiz_id}`)
 			.then((x) => x.data)
-			.catch(() => {});
+			.catch((e) => alert(e.response.data));
 
 		if (quiz)
 			this.setState({
@@ -71,7 +71,7 @@ class Quiz extends Component {
 				let id = await axios
 					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
-					.catch(() => {});
+					.catch((e) => alert(e.response.data));
 				if (!id) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
@@ -81,7 +81,7 @@ class Quiz extends Component {
 				let templates = await axios
 					.get(`/api/templates`)
 					.then((x) => x.data)
-					.catch(() => {});
+					.catch((e) => alert(e.response.data));
 
 				this.setState({ templates, template_id: templates[0]?.id });
 			},
@@ -90,7 +90,7 @@ class Quiz extends Component {
 			for (let i of Object.keys(getData)) {
 				await getData[i]();
 			}
-			if (this.state.quiz_id) this.getQuizData();
+			if (this.state.quiz_id) await this.getQuizData();
 			this.setState({ loading: false });
 		}
 		start.bind(this)();
@@ -104,11 +104,13 @@ class Quiz extends Component {
 			return alert(
 				`Вы не ввели: ${unchecked.map((x) => `${names[x]}`).join(", ")}`
 			);
-		let data = await axios.post(`/api/quizzes`, {
-			name: this.state.name,
-			description: this.state.description,
-			template_id: this.state.template_id,
-		});
+		let data = await axios
+			.post(`/api/quizzes`, {
+				name: this.state.name,
+				description: this.state.description,
+				template_id: this.state.template_id,
+			})
+			.catch((e) => alert(e.response.data));
 		if (data.status === 200) this.props.history.push(`/quizes/${data.data.id}`);
 		else alert(data.statusText);
 	}

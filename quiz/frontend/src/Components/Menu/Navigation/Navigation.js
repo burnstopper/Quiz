@@ -17,7 +17,6 @@ const Navigation = () => {
 						<Nav.Link
 							onClick={() => {
 								CookieLib.removeCookie();
-								console.log(CookieLib.getCookieToken());
 							}}
 						>
 							Выход
