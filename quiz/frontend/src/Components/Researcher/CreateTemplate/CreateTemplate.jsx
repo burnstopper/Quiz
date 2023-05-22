@@ -350,7 +350,7 @@ export default class Templates extends Component {
 					))}
 				</div>
 				<div id="downTiles">
-					<button id="btnPlayss" onClick={this.submit}>
+					<button id="btnPlayss" onClick={this.submit.bind(this)}>
 						Создать
 					</button>
 				</div>
