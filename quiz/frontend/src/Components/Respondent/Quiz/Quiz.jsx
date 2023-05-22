@@ -64,8 +64,6 @@ class Quiz extends Component {
 					.get(`/api/quizzes/${this.state.quiz_id}`, {
 						params: {
 							respondent_id: this.state.id,
-							results: true,
-							template: true,
 						},
 					})
 					.then((x) => x.data)
@@ -136,11 +134,13 @@ class Quiz extends Component {
 								<Link
 									id="btnQuiz"
 									style={{ textDecoration: "none" }}
-									to={`${this.state.tests[x.id].url}`}
+									to={`${this.state.tests.find((y) => y.id === x.id).url}`}
 									key={i}
 								>
 									<div className="btnQuizComponents">
-										<a id="titleTiles">{this.state.tests[x.id].name}</a>
+										<a id="titleTiles">
+											{this.state.tests.find((y) => y.id === x.id).name}
+										</a>
 										<span className="icon">
 											{this.state.quiz.results[x]?.length > 0 ? "✔️" : "⏱️"}
 										</span>
@@ -151,7 +151,9 @@ class Quiz extends Component {
 							return (
 								<div id="btnQuizDis" key={i}>
 									<div className="btnQuizComponents" styles={{ width: "80%" }}>
-										<a id="titleTiles">{this.state.tests[x.id].name}</a>
+										<a id="titleTiles">
+											{this.state.tests.find((y) => y.id === x.id).name}
+										</a>
 										<span class="icon">🔒</span>
 									</div>
 								</div>

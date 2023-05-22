@@ -58,21 +58,22 @@ export default class List extends Component {
 			},
 			getQuizes: async () => {
 				let quizes = await axios
-					.get("/api/quizzes/")
+					.get("/api/quizzes")
 					.then((x) => x.data)
 					.catch(() => {});
 
-				quizes = await Promise.all(
-					quizes.map(async (x) => ({
-						...x,
-						template: await axios
-							.get(`/api/templates/${x.template_id}`)
-							.then((y) => y.data),
-						results: await axios
-							.get(`/api/results/${x.id}`)
-							.then((y) => y.data.tests_result),
-					}))
-				);
+				if (quizes)
+					quizes = await Promise.all(
+						quizes.map(async (x) => ({
+							...x,
+							template: await axios
+								.get(`/api/templates/${x.template_id}`)
+								.then((y) => y.data),
+							results: await axios
+								.get(`/api/results/${x.id}`)
+								.then((y) => y.data.tests_result),
+						}))
+					);
 
 				console.log(quizes);
 
@@ -149,10 +150,10 @@ export default class List extends Component {
 									{Math.round(
 										(x.results.filter(
 											(y) =>
-												x.template.tests_ids.includes(x.results.indexOf(y)) &&
+												x.template.tests.includes(x.results.indexOf(y)) &&
 												y.length > 0
 										).length /
-											x.template.tests_ids.length) *
+											x.template.tests.length) *
 											100
 									)}
 									%

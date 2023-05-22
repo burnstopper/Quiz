@@ -98,8 +98,6 @@ export default withParams(
 						.get(`/api/quizzes/${this.state.quiz_id}`, {
 							params: {
 								respondent_id: this.state.id,
-								results: true,
-								template: true,
 							},
 						})
 						.then((x) => x.data)
