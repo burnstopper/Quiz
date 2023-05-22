@@ -22,7 +22,7 @@ class Quiz extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("http://localhost:8001/api/token/create_respondent")
+			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
 			.catch(console.log);
 		CookieLib.setCookieToken(token);
@@ -31,14 +31,11 @@ class Quiz extends Component {
 
 	async checkPermission() {
 		let check = await axios
-			.get(
-				`http://localhost:8001/api/quizzes/${this.state.quiz_id}/check_access`,
-				{
-					params: {
-						respondent_id: this.state.id,
-					},
-				}
-			)
+			.get(`/api/quizzes/${this.state.quiz_id}/check_access`, {
+				params: {
+					respondent_id: this.state.id,
+				},
+			})
 			.then((x) => x.data);
 		console.log(check.has_access);
 		// let check = true;
@@ -53,7 +50,7 @@ class Quiz extends Component {
 					token = await this.createToken();
 
 				let id = await axios
-					.get(`http://localhost:8001/api/token/${token}/id`)
+					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
 					.catch(() => {});
 
@@ -64,7 +61,7 @@ class Quiz extends Component {
 
 			getQuiz: async () => {
 				let quiz = await axios
-					.get(`http://localhost:8001/api/quizzes/${this.state.quiz_id}`, {
+					.get(`/api/quizzes/${this.state.quiz_id}`, {
 						params: {
 							respondent_id: this.state.id,
 							results: true,
@@ -77,10 +74,10 @@ class Quiz extends Component {
 				quiz = {
 					...quiz,
 					template: await axios
-						.get(`http://localhost:8001/api/templates/${quiz.template_id}`)
+						.get(`/api/templates/${quiz.template_id}`)
 						.then((x) => x.data),
 					results: await axios
-						.get(`http://localhost:8001/api/results/${quiz.id}`)
+						.get(`/api/results/${quiz.id}`)
 						.then((x) => x.data.tests_result),
 				};
 
@@ -88,7 +85,7 @@ class Quiz extends Component {
 			},
 			getTests: async () => {
 				let tests = await axios
-					.get(`http://localhost:8001/api/tests`)
+					.get(`/api/tests`)
 					.then((x) => x.data)
 					.catch(() => {});
 

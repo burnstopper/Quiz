@@ -28,7 +28,7 @@ class Quiz extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("http://localhost:8001/api/token/create_respondent")
+			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
 			.catch(console.log);
 		CookieLib.setCookieToken(token);
@@ -38,7 +38,7 @@ class Quiz extends Component {
 	async checkPermissions() {
 		// let check = await axios
 		// 	.get(
-		// 		`http://localhost:8001/api/token/${this.state.token}/check_researcher`
+		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
 		//  .catch(() => {});
@@ -48,7 +48,7 @@ class Quiz extends Component {
 
 	async getQuizData() {
 		let quiz = await axios
-			.get(`http://localhost:8001/api/quizzes/${this.state.quiz_id}`)
+			.get(`/api/quizzes/${this.state.quiz_id}`)
 			.then((x) => x.data)
 			.catch(() => {});
 
@@ -69,7 +69,7 @@ class Quiz extends Component {
 					token = await this.createToken();
 
 				let id = await axios
-					.get(`http://localhost:8001/api/token/${token}/id`)
+					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
 					.catch(() => {});
 				if (!id) token = await this.createToken();
@@ -79,7 +79,7 @@ class Quiz extends Component {
 
 			getTemplates: async () => {
 				let templates = await axios
-					.get(`http://localhost:8001/api/templates`)
+					.get(`/api/templates`)
 					.then((x) => x.data)
 					.catch(() => {});
 
@@ -104,7 +104,7 @@ class Quiz extends Component {
 			return alert(
 				`Вы не ввели: ${unchecked.map((x) => `${names[x]}`).join(", ")}`
 			);
-		let data = await axios.post(`http://localhost:8001/api/quizzes`, {
+		let data = await axios.post(`/api/quizzes`, {
 			name: this.state.name,
 			description: this.state.description,
 			template_id: this.state.template_id,

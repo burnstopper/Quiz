@@ -64,7 +64,7 @@ export default class Templates extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("http://localhost:8001/api/token/create_respondent")
+			.post("/api/token/create_respondent")
 			.then((x) => x.data)
 			.catch(() => {});
 		CookieLib.setCookieToken(token);
@@ -74,7 +74,7 @@ export default class Templates extends Component {
 	async checkPermissions() {
 		// let check = await axios
 		// 	.get(
-		// 		`http://localhost:8001/api/token/${this.state.token}/check_researcher`
+		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
 		//  .catch(() => {});
@@ -102,9 +102,7 @@ export default class Templates extends Component {
 				if (!token || token === undefined || token === "undefined")
 					token = await this.createToken();
 
-				let id = await axios
-					.get(`http://localhost:8001/api/token/${token}/id`)
-					.then((x) => x.data);
+				let id = await axios.get(`/api/token/${token}/id`).then((x) => x.data);
 				if (!token) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
@@ -112,7 +110,7 @@ export default class Templates extends Component {
 			// checkPermission: async () => {
 			// 	let check = await axios
 			// 		.get(
-			// 			`http://localhost:8001/api/token/${this.state.quiz_id}/check_researcher`
+			// 			`/api/token/${this.state.quiz_id}/check_researcher`
 			// 		)
 			// 		.then((x) => x.data);
 			// 	// let check = true;
@@ -122,14 +120,11 @@ export default class Templates extends Component {
 				let template;
 				if (this.state.template_id)
 					template = await axios
-						.get(
-							`http://localhost:8001/api/templates/${this.state.template_id}`,
-							{
-								params: {
-									// respondent_id: this.state.id
-								},
-							}
-						)
+						.get(`/api/templates/${this.state.template_id}`, {
+							params: {
+								// respondent_id: this.state.id
+							},
+						})
 						.then((x) => x.data)
 						.catch(() => {});
 				else {
@@ -167,7 +162,7 @@ export default class Templates extends Component {
 			},
 			getAllQuizes: async () => {
 				let tests = await axios
-					.get(`http://localhost:8001/api/tests`)
+					.get(`/api/tests`)
 					.then((x) => x.data)
 					.catch(() => {});
 				// let tests = [
@@ -199,10 +194,7 @@ export default class Templates extends Component {
 		if (this.state.template?.tests?.length <= 0)
 			return alert("Список тестов не может быть пустым");
 
-		let data = await axios.post(
-			`http://localhost:8001/api/templates`,
-			this.state.template
-		);
+		let data = await axios.post(`/api/templates`, this.state.template);
 		if (data.status === 200) this.props.history.push(`/researcher/templates`);
 		else alert(data.statusText);
 	}

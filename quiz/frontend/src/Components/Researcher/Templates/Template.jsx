@@ -31,7 +31,7 @@ export default class Templates extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("http://localhost:8001/api/token/create_respondent")
+			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
 			.catch(console.log);
 		CookieLib.setCookieToken(token);
@@ -41,7 +41,7 @@ export default class Templates extends Component {
 	async checkPermissions() {
 		// let check = await axios
 		// 	.get(
-		// 		`http://localhost:8001/api/token/${this.state.token}/check_researcher`
+		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
 		//  .catch(() => {});
@@ -57,7 +57,7 @@ export default class Templates extends Component {
 					token = await this.createToken();
 
 				let id = await axios
-					.get(`http://localhost:8001/api/token/${token}/id`)
+					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
 					.catch(() => {});
 
@@ -67,7 +67,7 @@ export default class Templates extends Component {
 			},
 			getTemplates: async () => {
 				let templates = await axios
-					.get("http://localhost:8001/api/templates", {
+					.get("/api/templates", {
 						params: {
 							// respondent_id: this.state.id
 						},

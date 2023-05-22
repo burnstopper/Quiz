@@ -23,7 +23,7 @@ export default class List extends Component {
 
 	async createToken() {
 		let token = await axios
-			.post("http://localhost:8001/api/token/create_respondent")
+			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
 			.catch(console.log);
 		CookieLib.setCookieToken(token);
@@ -38,7 +38,7 @@ export default class List extends Component {
 					token = await this.createToken();
 
 				let id = await axios
-					.get(`http://localhost:8001/api/token/${token}/id`)
+					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
 					.catch(() => {});
 				if (!id) token = await this.createToken();
@@ -47,7 +47,7 @@ export default class List extends Component {
 			},
 			getQuizes: async () => {
 				let quizes = await axios
-					.get("http://localhost:8001/api/quizzes", {
+					.get("/api/quizzes", {
 						params: {
 							respondent_id: this.state.id,
 						},
@@ -55,17 +55,18 @@ export default class List extends Component {
 					.then((x) => x.data)
 					.catch(() => {});
 
-				quizes = await Promise.all(
-					quizes.map(async (x) => ({
-						...x,
-						template: await axios
-							.get(`http://localhost:8001/api/templates/${x.template_id}`)
-							.then((y) => y.data),
-						results: await axios
-							.get(`http://localhost:8001/api/results/${x.id}`)
-							.then((y) => y.data.tests_result),
-					}))
-				);
+				if (quizes)
+					quizes = await Promise.all(
+						quizes.map(async (x) => ({
+							...x,
+							template: await axios
+								.get(`/api/templates/${x.template_id}`)
+								.then((y) => y.data),
+							results: await axios
+								.get(`/api/results/${x.id}`)
+								.then((y) => y.data.tests_result),
+						}))
+					);
 
 				this.setState({ quizes, filtered: quizes });
 			},

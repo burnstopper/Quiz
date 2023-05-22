@@ -53,7 +53,7 @@ export default withParams(
 
 		async createToken() {
 			let token = await axios
-				.post("http://localhost:8001/api/token/create_respondent")
+				.post("/api/token/create_respondent")
 				.then((x) => x.data)
 				.catch(() => {});
 			CookieLib.setCookieToken(token);
@@ -63,7 +63,7 @@ export default withParams(
 		async checkPermissions() {
 			// let check = await axios
 			// 	.get(
-			// 		`http://localhost:8001/api/token/${this.state.token}/check_researcher`
+			// 		`/api/token/${this.state.token}/check_researcher`
 			// 	)
 			// 	.then((x) => x.data)
 			//  .catch(() => {});
@@ -80,7 +80,7 @@ export default withParams(
 						token = await this.createToken();
 
 					let id = await axios
-						.get(`http://localhost:8001/api/token/${token}/id`)
+						.get(`/api/token/${token}/id`)
 						.then((x) => x.data);
 					if (!token) token = await this.createToken();
 
@@ -95,7 +95,7 @@ export default withParams(
 				},
 				getQuiz: async () => {
 					let quiz = await axios
-						.get(`http://localhost:8001/api/quizzes/${this.state.quiz_id}`, {
+						.get(`/api/quizzes/${this.state.quiz_id}`, {
 							params: {
 								respondent_id: this.state.id,
 								results: true,
@@ -105,15 +105,14 @@ export default withParams(
 						.then((x) => x.data)
 						.catch(() => {});
 
-					console.log(quiz);
 					if (quiz)
 						quiz = {
 							...quiz,
 							template: await axios
-								.get(`http://localhost:8001/api/templates/${quiz.template_id}`)
+								.get(`/api/templates/${quiz.template_id}`)
 								.then((x) => x.data),
 							results: await axios
-								.get(`http://localhost:8001/api/results/${quiz.id}`)
+								.get(`/api/results/${quiz.id}`)
 								.then((x) => x.data.tests_result),
 						};
 					// let quiz = {
