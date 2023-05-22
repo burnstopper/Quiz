@@ -71,15 +71,16 @@ class Quiz extends Component {
 					.then((x) => x.data)
 					.catch(() => {});
 
-				quiz = {
-					...quiz,
-					template: await axios
-						.get(`/api/templates/${quiz.template_id}`)
-						.then((x) => x.data),
-					results: await axios
-						.get(`/api/results/${quiz.id}`)
-						.then((x) => x.data.tests_result),
-				};
+				if (quiz)
+					quiz = {
+						...quiz,
+						template: await axios
+							.get(`/api/templates/${quiz.template_id}`)
+							.then((x) => x.data),
+						results: await axios
+							.get(`/api/results/${quiz.id}`)
+							.then((x) => x.data.tests_result),
+					};
 
 				this.setState({ quiz });
 			},

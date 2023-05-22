@@ -187,7 +187,6 @@ export default class Templates extends Component {
 	}
 
 	async submit() {
-		console.log(this.state);
 		if (!this.state.name || this.state.name === "")
 			return alert("Вы не ввели название");
 
@@ -351,7 +350,7 @@ export default class Templates extends Component {
 					))}
 				</div>
 				<div id="downTiles">
-					<button id="btnPlayss" onClick={() => {}}>
+					<button id="btnPlayss" onClick={this.submit}>
 						Создать
 					</button>
 				</div>

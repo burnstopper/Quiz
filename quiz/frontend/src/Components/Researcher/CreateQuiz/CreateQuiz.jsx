@@ -83,7 +83,7 @@ class Quiz extends Component {
 					.then((x) => x.data)
 					.catch(() => {});
 
-				this.setState({ templates, template_id: templates[0].id });
+				this.setState({ templates, template_id: templates[0]?.id });
 			},
 		};
 		async function start() {
