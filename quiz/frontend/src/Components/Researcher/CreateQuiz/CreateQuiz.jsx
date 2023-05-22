@@ -172,14 +172,10 @@ class Quiz extends Component {
 						<select
 							id="select"
 							value={this.state.template_id}
-							onChange={() => {}}
+							onChange={(e) => this.setState({ template_id: e.target.value })}
 						>
 							{this.state.templates.map((x) => (
-								<option
-									key={x.id}
-									onChange={() => this.setState({ template_id: x.id })}
-									value={x.id}
-								>
+								<option key={x.id} value={x.id}>
 									{x.name}
 								</option>
 							))}
