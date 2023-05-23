@@ -25,12 +25,14 @@ async def get_quiz_results_status(quiz_id: int, respondent_id: int = None,
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
 
+    params = await get_params(quiz_id=quiz_id, respondent_id=respondent_id, db=db)
+
     # sets retries amount to 10 and if after this Test microservice does not respond - raise normal exception (5xx)
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
         response = await client.get(url=f'http://{settings.TEST_SERVICE_URL}/api/gateway/v1/results/exists',
-                                    params=await get_params(quiz_id=quiz_id, respondent_id=respondent_id, db=db),
+                                    params=params,
                                     headers={'Authorization': f'Bearer {settings.TEST_SERVICES_BEARER_TOKEN}'}
                                     )
 
@@ -47,12 +49,14 @@ async def get_quiz_results(quiz_id: int, respondent_id: int = None, db: AsyncSes
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Quiz with this id does not exist')
 
+    params = await get_params(quiz_id=quiz_id, respondent_id=respondent_id, db=db)
+
     # sets retries amount to 10 and if after this Test microservice does not respond - raise normal exception (5xx)
     transport = httpx.AsyncHTTPTransport(retries=10)
     timeout = httpx.Timeout(1.0)
     async with httpx.AsyncClient(transport=transport, timeout=timeout) as client:
         response = await client.get(url=f'http://{settings.TEST_SERVICE_URL}/api/gateway/v1/results/by-quiz',
-                                    params=await get_params(quiz_id=quiz_id, respondent_id=respondent_id, db=db),
+                                    params=params,
                                     headers={'Authorization': f'Bearer {settings.TEST_SERVICES_BEARER_TOKEN}'}
                                     )
 
