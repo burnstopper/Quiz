@@ -16,6 +16,6 @@ async def get_tests_data() -> list[TemplateTest]:
     Get all tests
     """
 
-    tests_ids: list[int] = [1, 2, 3, 4]  # push back 5 for questionnaire
+    tests_ids: list[int] = [1, 2, 3, 4, 5]  # push back 5 for questionnaire
     return [get_test_data(test_id=test_id) for test_id in tests_ids]
 
