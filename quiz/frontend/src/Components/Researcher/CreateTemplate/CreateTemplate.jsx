@@ -65,7 +65,7 @@ export default class Templates extends Component {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data)
-			.catch((e) => alert(e.response.data));
+			.catch((e) => alert(e.response.statusText));
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -76,7 +76,7 @@ export default class Templates extends Component {
 		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
-		//  .catch((e) => alert(e.response.data));
+		//  .catch((e) => alert(e.response.statusText));
 		let check = true;
 		this.setState({ check });
 	}
@@ -94,9 +94,9 @@ export default class Templates extends Component {
 
 	async getTemplateData() {
 		let template = await axios
-			.get(`/api/templates/${this.state.quiz_id}`)
+			.get(`/api/templates/${this.state.template_id}`)
 			.then((x) => x.data)
-			.catch((e) => alert(e.response.data));
+			.catch((e) => alert(e.response.statusText));
 
 		if (template)
 			this.setState({
@@ -116,7 +116,7 @@ export default class Templates extends Component {
 				let id = await axios
 					.get(`/api/token/${token}/id`)
 					.then((x) => x.data)
-					.catch((e) => alert(e.response.data));
+					.catch((e) => alert(e.response.statusText));
 				if (!token) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
@@ -126,7 +126,7 @@ export default class Templates extends Component {
 			// 		.get(
 			// 			`/api/token/${this.state.quiz_id}/check_researcher`
 			// 		)
-			// 		.then((x) => x.data).catch((e) => alert(e.response.data));
+			// 		.then((x) => x.data).catch((e) => alert(e.response.statusText));
 			// 	// let check = true;
 			// 	this.setState({ check });
 			// },
@@ -140,7 +140,7 @@ export default class Templates extends Component {
 							},
 						})
 						.then((x) => x.data)
-						.catch((e) => alert(e.response.data));
+						.catch((e) => alert(e.response.statusText));
 				else {
 					template = {
 						name: "",
@@ -178,7 +178,7 @@ export default class Templates extends Component {
 				let tests = await axios
 					.get(`/api/tests`)
 					.then((x) => x.data)
-					.catch((e) => alert(e.response.data));
+					.catch((e) => alert(e.response.statusText));
 				// let tests = [
 				// 	{ id: 1, name: "Что-то первое" },
 				// 	{ id: 2, name: "Что-то второе" },
@@ -215,7 +215,7 @@ export default class Templates extends Component {
 				tests_ids: this.state.template.tests.map((x) => x.id),
 				name: this.state.name,
 			})
-			.catch((e) => alert(e.response.data));
+			.catch((e) => alert(e.response.statusText));
 		if (data.status === 200) this.props.history.push(`/researcher/templates`);
 		else alert(data.statusText);
 	}

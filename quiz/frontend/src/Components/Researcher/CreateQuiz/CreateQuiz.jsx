@@ -30,7 +30,7 @@ class Quiz extends Component {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
-			.catch((e) => alert(e.response.data));
+			.catch((e) => alert(e.response.statusText));
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -41,7 +41,7 @@ class Quiz extends Component {
 		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
-		//  .catch((e) => alert(e.response.data));
+		//  .catch((e) => alert(e.response.statusText));
 		let check = true;
 		this.setState({ check });
 	}
@@ -50,7 +50,7 @@ class Quiz extends Component {
 		let quiz = await axios
 			.get(`/api/quizzes/${this.state.quiz_id}`)
 			.then((x) => x.data)
-			.catch((e) => alert(e.response.data));
+			.catch((e) => alert(e.response.statusText));
 
 		if (quiz)
 			this.setState({
@@ -71,7 +71,7 @@ class Quiz extends Component {
 				let id = await axios
 					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
-					.catch((e) => alert(e.response.data));
+					.catch((e) => alert(e.response.statusText));
 				if (!id) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
@@ -81,7 +81,7 @@ class Quiz extends Component {
 				let templates = await axios
 					.get(`/api/templates`)
 					.then((x) => x.data)
-					.catch((e) => alert(e.response.data));
+					.catch((e) => alert(e.response.statusText));
 
 				this.setState({ templates, template_id: templates[0]?.id });
 			},
@@ -110,7 +110,7 @@ class Quiz extends Component {
 				description: this.state.description,
 				template_id: this.state.template_id,
 			})
-			.catch((e) => alert(e.response.data));
+			.catch((e) => alert(e.response.statusText));
 		if (data.status === 200) this.props.history.push(`/quizes/${data.data.id}`);
 		else alert(data.statusText);
 	}

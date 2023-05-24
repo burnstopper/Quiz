@@ -33,7 +33,7 @@ export default class Templates extends Component {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data.respondent_token)
-			.catch((e) => alert(e.response.data));
+			.catch((e) => alert(e.response.statusText));
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -44,7 +44,7 @@ export default class Templates extends Component {
 		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
-		//  .catch((e) => alert(e.response.data));
+		//  .catch((e) => alert(e.response.statusText));
 		let check = true;
 		this.setState({ check });
 	}
@@ -59,7 +59,7 @@ export default class Templates extends Component {
 				let id = await axios
 					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
-					.catch((e) => alert(e.response.data));
+					.catch((e) => alert(e.response.statusText));
 
 				if (!id) token = await this.createToken();
 
@@ -73,7 +73,7 @@ export default class Templates extends Component {
 						},
 					})
 					.then((x) => x.data)
-					.catch((e) => alert(e.response.data));
+					.catch((e) => alert(e.response.statusText));
 
 				// quizes = quizes.map(async (x) => ({
 				// 	...quizes,

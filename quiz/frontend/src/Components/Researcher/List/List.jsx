@@ -25,7 +25,7 @@ export default class List extends Component {
 		let token = await axios
 			.post("/api/token/create_respondent")
 			.then((x) => x.data)
-			.catch((e) => alert(e.response.data));
+			.catch((e) => alert(e.response.statusText));
 		CookieLib.setCookieToken(token);
 		return token;
 	}
@@ -36,7 +36,7 @@ export default class List extends Component {
 		// 		`/api/token/${this.state.token}/check_researcher`
 		// 	)
 		// 	.then((x) => x.data)
-		//  .catch((e) => alert(e.response.data));
+		//  .catch((e) => alert(e.response.statusText));
 		let check = true;
 		this.setState({ check });
 	}
@@ -51,7 +51,7 @@ export default class List extends Component {
 				let id = await axios
 					.get(`/api/token/${token}/id`)
 					.then((x) => x.data.respondent_id)
-					.catch((e) => alert(e.response.data));
+					.catch((e) => alert(e.response.statusText));
 				if (!token) token = await this.createToken();
 
 				this.setState({ token, id }, this.checkPermissions);
@@ -60,7 +60,7 @@ export default class List extends Component {
 				let quizes = await axios
 					.get("/api/quizzes")
 					.then((x) => x.data)
-					.catch((e) => alert(e.response.data));
+					.catch((e) => alert(e.response.statusText));
 
 				if (quizes)
 					quizes = await Promise.all(
@@ -69,11 +69,11 @@ export default class List extends Component {
 							template: await axios
 								.get(`/api/templates/${x.template_id}`)
 								.then((y) => y.data)
-								.catch((e) => alert(e.response.data)),
+								.catch((e) => alert(e.response.statusText)),
 							results: await axios
 								.get(`/api/results/${x.id}`)
 								.then((y) => y.data.tests_result)
-								.catch((e) => alert(e.response.data)),
+								.catch((e) => alert(e.response.statusText)),
 						}))
 					);
 

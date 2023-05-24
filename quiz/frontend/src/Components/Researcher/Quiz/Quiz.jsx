@@ -54,7 +54,7 @@ export default withParams(
 			let token = await axios
 				.post("/api/token/create_respondent")
 				.then((x) => x.data)
-				.catch((e) => alert(e.response.data));
+				.catch((e) => alert(e.response.statusText));
 			CookieLib.setCookieToken(token);
 			return token;
 		}
@@ -65,7 +65,7 @@ export default withParams(
 			// 		`/api/token/${this.state.token}/check_researcher`
 			// 	)
 			// 	.then((x) => x.data)
-			//  .catch((e) => alert(e.response.data));
+			//  .catch((e) => alert(e.response.statusText));
 			let check = true;
 			this.setState({ check });
 		}
@@ -81,7 +81,7 @@ export default withParams(
 					let id = await axios
 						.get(`/api/token/${token}/id`)
 						.then((x) => x.data)
-						.catch((e) => alert(e.response.data));
+						.catch((e) => alert(e.response.statusText));
 					if (!token) token = await this.createToken();
 
 					this.setState({ token, id }, this.checkPermissions);
@@ -89,7 +89,7 @@ export default withParams(
 				checkPermission: async () => {
 					// let check = await axios
 					// 	.get(`/token/${this.state.quiz_id}/check_researcher`)
-					// 	.then((x) => x.data).catch((e) => alert(e.response.data));
+					// 	.then((x) => x.data).catch((e) => alert(e.response.statusText));
 					let check = true;
 					this.setState({ check });
 				},
@@ -101,7 +101,7 @@ export default withParams(
 							},
 						})
 						.then((x) => x.data)
-						.catch((e) => alert(e.response.data));
+						.catch((e) => alert(e.response.statusText));
 
 					if (quiz)
 						quiz = {
@@ -109,11 +109,11 @@ export default withParams(
 							template: await axios
 								.get(`/api/templates/${quiz.template_id}`)
 								.then((x) => x.data)
-								.catch((e) => alert(e.response.data)),
+								.catch((e) => alert(e.response.statusText)),
 							results: await axios
 								.get(`/api/results/${quiz.id}`)
 								.then((x) => x.data.tests_result)
-								.catch((e) => alert(e.response.data)),
+								.catch((e) => alert(e.response.statusText)),
 						};
 					// let quiz = {
 					// 	name: "Квиз 2",
