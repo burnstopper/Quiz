@@ -77,7 +77,9 @@ class Quiz extends Component {
 							.then((x) => x.data)
 							.catch((e) => alert(e.response.statusText)),
 						results: await axios
-							.get(`/api/results/${quiz.id}`)
+							.get(`/api/results/${quiz.id}`, {
+								respondent_id: this.state.id,
+							})
 							.then((x) => x.data.tests_result)
 							.catch((e) => alert(e.response.statusText)),
 					};
@@ -125,8 +127,8 @@ class Quiz extends Component {
 				<div id="btnTile">
 					{this.state.quiz.template.tests.map((x, i) => {
 						if (
-							this.state.quiz.results[this.state.quiz.template.tests[i - 1]]
-								?.length > 0 ||
+							this.state.quiz.results.filter((y) => y.id === x.id)?.length >
+								0 ||
 							i === 0
 						)
 							return (

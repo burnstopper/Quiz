@@ -177,13 +177,22 @@ export default withParams(
 
 			if (this.state.template?.tests?.length <= 0)
 				return alert("Список тестов не может быть пустым");
-
-			let data = await axios
-				.post(`/api/templates`, {
-					tests_ids: this.state.template.tests.map((x) => x.id),
-					name: this.state.name,
-				})
-				.catch((e) => alert(e.response.statusText));
+			let data;
+			if (!this.state.edit)
+				data = await axios
+					.post(`/api/templates`, {
+						tests_ids: this.state.template.tests.map((x) => x.id),
+						name: this.state.name,
+					})
+					.catch((e) => alert(e.response.statusText));
+			else
+				data = await axios
+					.post(`/api/templates`, {
+						id: this.state.template_id,
+						tests_ids: this.state.template.tests.map((x) => x.id),
+						name: this.state.name,
+					})
+					.catch((e) => alert(e.response.statusText));
 			if (data.status === 200) window.location.href = `/researcher/templates`;
 			else alert(data.statusText);
 		}

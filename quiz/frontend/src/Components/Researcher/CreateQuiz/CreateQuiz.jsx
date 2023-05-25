@@ -105,13 +105,24 @@ class Quiz extends Component {
 			return alert(
 				`Вы не ввели: ${unchecked.map((x) => `${names[x]}`).join(", ")}`
 			);
-		let data = await axios
-			.post(`/api/quizzes`, {
-				name: this.state.name,
-				description: this.state.description,
-				template_id: this.state.template_id,
-			})
-			.catch((e) => alert(e.response.statusText));
+		let data;
+		if (!this.state.edit)
+			data = await axios
+				.post(`/api/quizzes`, {
+					name: this.state.name,
+					description: this.state.description,
+					template_id: this.state.template_id,
+				})
+				.catch((e) => alert(e.response.statusText));
+		else
+			data = await axios
+				.put(`/api/quizzes`, {
+					id: this.state.quiz_id,
+					name: this.state.name,
+					description: this.state.description,
+					template_id: this.state.template_id,
+				})
+				.catch((e) => alert(e.response.statusText));
 		if (data.status === 200)
 			window.location.href = `/researcher/info/${data.data.id}`;
 		else alert(data.statusText);

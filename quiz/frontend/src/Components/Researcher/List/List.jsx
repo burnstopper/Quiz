@@ -148,18 +148,7 @@ export default class List extends Component {
 								key={i}
 							>
 								<a id="titleTile">{x.name}</a>
-								<a id="descTile">
-									{Math.round(
-										(x.results.filter(
-											(y) =>
-												x.template.tests.includes(x.results.indexOf(y)) &&
-												y.length > 0
-										).length /
-											x.template.tests.length) *
-											100
-									)}
-									%
-								</a>
+								<a id="descTile">x.invite_link</a>
 
 								<div className="quizComponentContainer">
 									<button

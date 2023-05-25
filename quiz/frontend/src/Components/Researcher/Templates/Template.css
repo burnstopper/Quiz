@@ -325,14 +325,14 @@ body {
     margin-right: 25%;
     margin-top: 15px;
     /* margin-bottom: 5%; */
-    width: 10%;
+    width: 20%;
     height: 50px;
     align-items: right;
     font-family: 'Inter';
     /* font-weight: 150; */
     font-size: 15px;
     /* cursor: pointer; */
-    max-width: 200px;
+    max-width: 300px;
     /* position: relative;  */
   
 }
