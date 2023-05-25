@@ -129,8 +129,9 @@ class Quiz extends Component {
 				<div id="btnTile">
 					{this.state.quiz.template.tests.map((x, i) => {
 						if (
-							this.state.quiz.results.filter((y) => y.id === x.id)?.length >
-								0 ||
+							this.state.quiz.results.filter(
+								(y) => y.id === x.id && y.results.length > 0
+							)?.length > 0 ||
 							i === 0
 						)
 							return (

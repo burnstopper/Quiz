@@ -161,12 +161,18 @@ export default withParams(
 									Кол-во участников: {this.state.quiz.respondents.length} <br />
 									{this.state.quiz.respondents
 										.map((x) => {
-											let results = this.state.quiz.results.filter(
-												(y) => y.respondent_id === x
-											);
-
 											let res = Math.round(
-												([...new Set(results.map((item) => item.id))].length /
+												([
+													...new Set(
+														this.state.quiz.results
+															.filter(
+																(y) =>
+																	y.results.filter((z) => z.respondent_id === x)
+																		.length > 0
+															)
+															.map((item) => item.id)
+													),
+												].length /
 													this.state.template.tests.length) *
 													100
 											);

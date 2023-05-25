@@ -128,7 +128,13 @@ export default class List extends Component {
 								<a id="titleTile">{x.name}</a>
 								<a id="descTile">
 									{Math.round(
-										([...new Set(x.results.map((item) => item.id))].length /
+										([
+											...new Set(
+												x.results
+													.filter((y) => y.results.length > 0)
+													.map((item) => item.id)
+											),
+										].length /
 											x.template.tests.length) *
 											100
 									)}
