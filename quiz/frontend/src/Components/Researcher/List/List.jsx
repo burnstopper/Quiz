@@ -4,7 +4,7 @@ import CookieLib from "../../../cookielib/index";
 import axios from "axios";
 import LoadingScreen from "react-loading-screen";
 import { Spinner } from "react-bootstrap";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 let i = 0;
 function isBlank(str) {
@@ -123,7 +123,9 @@ export default class List extends Component {
 						</button>
 						<button
 							type="submit"
-							onClick={() => (window.location.href = "/quizes/create")}
+							onClick={() =>
+								(window.location.href = "/researcher/quizes/create")
+							}
 							id="btnPlay"
 						>
 							Создать опрос
@@ -161,14 +163,16 @@ export default class List extends Component {
 
 								<div className="quizComponentContainer">
 									<button
-										onClick={() => (window.location.href += `/${x.id}`)}
+										onClick={() =>
+											(window.location.href = `/researcher/info/${x.id}`)
+										}
 										id="quizBtnComponent"
 									>
 										Открыть
 									</button>
 
 									<button
-										onClick={() => (window.location.href += `/${x.id}/edit`)}
+										onClick={() => (window.location.href += `/${x.id}`)}
 										id="quizBtnComponent"
 									>
 										Редактировать

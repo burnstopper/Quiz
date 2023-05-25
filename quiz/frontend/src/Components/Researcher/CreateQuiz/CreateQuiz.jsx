@@ -90,7 +90,8 @@ class Quiz extends Component {
 			for (let i of Object.keys(getData)) {
 				await getData[i]();
 			}
-			if (this.state.quiz_id) await this.getQuizData();
+			if (this.state.quiz_id && this.state.quiz_id !== "create")
+				await this.getQuizData();
 			this.setState({ loading: false });
 		}
 		start.bind(this)();
@@ -111,7 +112,8 @@ class Quiz extends Component {
 				template_id: this.state.template_id,
 			})
 			.catch((e) => alert(e.response.statusText));
-		if (data.status === 200) this.props.history.push(`/quizes/${data.data.id}`);
+		if (data.status === 200)
+			window.location.href = `/researcher/info/${data.data.id}`;
 		else alert(data.statusText);
 	}
 

@@ -133,7 +133,9 @@ class Quiz extends Component {
 								<Link
 									id="btnQuiz"
 									style={{ textDecoration: "none" }}
-									to={`${this.state.tests.find((y) => y.id === x.id).url}`}
+									to={`${
+										this.state.tests.find((y) => y.id === x.id).url
+									}?quiz_id=${x.id}&redirect_url=${window.location.href}`}
 									key={i}
 								>
 									<div className="btnQuizComponents">

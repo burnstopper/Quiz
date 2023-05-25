@@ -38,27 +38,19 @@ root.render(
 			<Routes>
 				<Route path="/quizes" element={<Respondent id={id} />} />
 				<Route path="/quizes/:quiz" element={<Quiz id={id} />} />
-				<Route
-					path="/researcher/quizes/create"
-					element={<CreateQuiz id={id} />}
-				/>
-				<Route
-					path="/researcher/quizes/:quiz/edit"
-					element={<CreateQuiz id={id} />}
-				/>
 				<Route path="/researcher/quizes" element={<List id={id} />} />
-				<Route path="/researcher/templates" element={<Templates id={id} />} />
 				<Route
-					path="/researcher/templates/create"
-					element={<CreateTemplate id={id} />}
+					path="/researcher/quizes/:quiz"
+					element={<CreateQuiz id={id} />}
 				/>
+				<Route
+					path="/researcher/info/:quiz"
+					element={<QuizResearch id={id} />}
+				/>
+				<Route path="/researcher/templates" element={<Templates id={id} />} />
 				<Route
 					path="/researcher/templates/:template"
 					element={<CreateTemplate id={id} />}
-				/>
-				<Route
-					path="/researcher/quizes/:quiz"
-					element={<QuizResearch id={id} />}
 				/>
 				<Route path="*" element={<Redirect />} />
 			</Routes>

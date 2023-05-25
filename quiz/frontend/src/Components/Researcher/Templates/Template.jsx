@@ -40,11 +40,9 @@ export default class Templates extends Component {
 
 	async checkPermissions() {
 		// let check = await axios
-		// 	.get(
-		// 		`/api/token/${this.state.token}/check_researcher`
-		// 	)
+		// 	.get(`/api/token/${this.state.token}/check_researcher`)
 		// 	.then((x) => x.data)
-		//  .catch((e) => alert(e.response.statusText));
+		// 	.catch((e) => alert(e.response.statusText));
 		let check = true;
 		this.setState({ check });
 	}
@@ -182,7 +180,9 @@ export default class Templates extends Component {
 
 						<button
 							type="submit"
-							onClick={() => (window.location.href = "/quizes/create")}
+							onClick={() =>
+								(window.location.href = "/researcher/templates/create")
+							}
 							id="btnPlays"
 						>
 							Создать шаблон
@@ -240,7 +240,9 @@ export default class Templates extends Component {
 										Создать опрос
 									</button>
 									<button
-										onClick={() => (window.location.href += `/${x.id}/edit`)}
+										onClick={() =>
+											(window.location.href += `/researcher/templates/${x.id}`)
+										}
 										id="quizBtnComponent"
 									>
 										Редактировать
