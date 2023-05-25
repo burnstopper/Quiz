@@ -82,13 +82,11 @@ export default withParams(
 		}
 
 		async checkPermissions() {
-			// let check = await axios
-			// 	.get(
-			// 		`/api/token/${this.state.token}/check_researcher`
-			// 	)
-			// 	.then((x) => x.data)
-			//  .catch((e) => alert(e.response.statusText));
-			let check = true;
+			let check = await axios
+				.get(`/api/token/${this.state.token}/check_researcher`)
+				.then((x) => x.data)
+				.catch((e) => alert(e.response.statusText));
+			// let check = true;
 			this.setState({ check });
 		}
 

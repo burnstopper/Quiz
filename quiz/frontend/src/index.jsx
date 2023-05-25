@@ -15,6 +15,7 @@ import Templates from "./Components/Researcher/Templates/Template";
 import CreateTemplate from "./Components/Researcher/CreateTemplate/CreateTemplate";
 import QuizResearch from "./Components/Researcher/Quiz/Quiz";
 import Redirect from "./Components/Redirect";
+import Invite from "./Components/Respondent/Invite/Invite";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 let id = Math.floor(Math.random() * 1000000 + 10000000);
@@ -52,6 +53,7 @@ root.render(
 					path="/researcher/templates/:template"
 					element={<CreateTemplate id={id} />}
 				/>
+				<Route path="/invite/quizzes/:quiz/add" element={<Invite id={id} />} />
 				<Route path="*" element={<Redirect />} />
 			</Routes>
 		</div>

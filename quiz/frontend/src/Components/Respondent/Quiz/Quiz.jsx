@@ -78,7 +78,9 @@ class Quiz extends Component {
 							.catch((e) => alert(e.response.statusText)),
 						results: await axios
 							.get(`/api/results/${quiz.id}`, {
-								respondent_id: this.state.id,
+								params: {
+									respondent_id: this.state.id,
+								},
 							})
 							.then((x) => x.data.tests_result)
 							.catch((e) => alert(e.response.statusText)),

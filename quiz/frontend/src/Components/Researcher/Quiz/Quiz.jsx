@@ -60,13 +60,11 @@ export default withParams(
 		}
 
 		async checkPermissions() {
-			// let check = await axios
-			// 	.get(
-			// 		`/api/token/${this.state.token}/check_researcher`
-			// 	)
-			// 	.then((x) => x.data)
-			//  .catch((e) => alert(e.response.statusText));
-			let check = true;
+			let check = await axios
+				.get(`/api/token/${this.state.token}/check_researcher`)
+				.then((x) => x.data)
+				.catch((e) => alert(e.response.statusText));
+			// let check = true;
 			this.setState({ check });
 		}
 
@@ -87,10 +85,11 @@ export default withParams(
 					this.setState({ token, id }, this.checkPermissions);
 				},
 				checkPermission: async () => {
-					// let check = await axios
-					// 	.get(`/token/${this.state.quiz_id}/check_researcher`)
-					// 	.then((x) => x.data).catch((e) => alert(e.response.statusText));
-					let check = true;
+					let check = await axios
+						.get(`/token/${this.state.quiz_id}/check_researcher`)
+						.then((x) => x.data)
+						.catch((e) => alert(e.response.statusText));
+					// let check = true;
 					this.setState({ check });
 				},
 				getQuiz: async () => {
@@ -114,7 +113,12 @@ export default withParams(
 								.get(`/api/results/${quiz.id}`)
 								.then((x) => x.data.tests_result)
 								.catch((e) => alert(e.response.statusText)),
+							respondents: await axios
+								.get(`/api/quizzes/${quiz.id}/respondents`)
+								.then((x) => x.data.respondents)
+								.catch((e) => alert(e.response.statusText)),
 						};
+
 					// let quiz = {
 					// 	name: "Квиз 2",
 					// 	description: "Опрос для БКНАД 211 и БКНАД 212, всем хорошего дня",
@@ -152,19 +156,38 @@ export default withParams(
 					<div className="container">
 						<Accordion id="accord-block" defaultActiveKey="0">
 							<Accordion.Item id="accord-item" eventKey="0">
-								<Accordion.Header>Название</Accordion.Header>
+								<Accordion.Header>{this.state.quiz.name}</Accordion.Header>
 								<Accordion.Body>
-									Кол-во участников <br /> Участник (63%) 1 <br /> Участник 2
-									(0%)
+									Кол-во участников: {this.state.quiz.respondents.length} <br />
+									{this.state.quiz.respondents
+										.map((x) => {
+											let results = this.state.quiz.results.filter(
+												(y) => y.respondent_id === x
+											);
+
+											let res = Math.round(
+												([...new Set(results.map((item) => item.id))].length /
+													this.state.template.tests.length) *
+													100
+											);
+
+											return (
+												<>
+													{x} ({res}%) <br />
+												</>
+											);
+										})
+										.join(`\n`)}
 								</Accordion.Body>
 							</Accordion.Item>
 						</Accordion>
 						<Accordion id="accord-block" defaultActiveKey="0">
 							<Accordion.Item id="accord-item" eventKey="0">
-								<Accordion.Header>Ссылка</Accordion.Header>
+								<Accordion.Header>
+									{this.state.quiz.invite_link}
+								</Accordion.Header>
 								<Accordion.Body id="accord-text">
-									Кол-во участников <br /> Участник (63%) 1 <br /> Участник 2
-									(0%)
+									{this.state.quiz.description}
 								</Accordion.Body>
 							</Accordion.Item>
 						</Accordion>

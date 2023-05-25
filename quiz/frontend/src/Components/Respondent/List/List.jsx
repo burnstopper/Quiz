@@ -64,7 +64,11 @@ export default class List extends Component {
 								.then((y) => y.data)
 								.catch((e) => alert(e.response.statusText)),
 							results: await axios
-								.get(`/api/results/${x.id}`)
+								.get(`/api/results/${x.id}`, {
+									params: {
+										respondent_id: this.state.id,
+									},
+								})
 								.then((y) => y.data.tests_result)
 								.catch((e) => alert(e.response.statusText)),
 						}))
@@ -124,11 +128,7 @@ export default class List extends Component {
 								<a id="titleTile">{x.name}</a>
 								<a id="descTile">
 									{Math.round(
-										(x.results.filter(
-											(y) =>
-												x.template.tests.includes(x.results.indexOf(y)) &&
-												y.length > 0
-										).length /
+										([...new Set(x.results.map((item) => item.id))].length /
 											x.template.tests.length) *
 											100
 									)}
