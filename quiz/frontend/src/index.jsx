@@ -6,6 +6,8 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import CookieLib from "./cookielib/index";
+
 import Respondent from "./Components/Respondent/List/List";
 import Header from "./Components/Menu/Header/Header";
 import Quiz from "./Components/Respondent/Quiz/Quiz";
@@ -57,6 +59,7 @@ root.render(
 				<Route path="*" element={<Redirect />} />
 			</Routes>
 		</div>
+		<CookieLib.CookieFooter />
 	</Router>
 );
 
