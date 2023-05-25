@@ -36,7 +36,7 @@ async def get_quiz_results_status(quiz_id: int, respondent_id: int = None,
                                     headers={'Authorization': f'Bearer {settings.TEST_SERVICES_BEARER_TOKEN}'}
                                     )
 
-    return QuizResultsStatus(**{'quiz_id': quiz_id, 'tests_status': response.content})
+    return QuizResultsStatus(**{'quiz_id': quiz_id, 'tests_status': response.content, 'respondent_id': respondent_id})
 
 
 @router.get('/{quiz_id}', status_code=status.HTTP_200_OK, response_model=QuizResults)
@@ -61,7 +61,7 @@ async def get_quiz_results(quiz_id: int, respondent_id: int = None, db: AsyncSes
                                     )
 
     tests_results = parse_results_json(results_json=response.json())
-    return QuizResults(**{'quiz_id': quiz_id, 'tests_result': tests_results})
+    return QuizResults(**{'quiz_id': quiz_id, 'tests_result': tests_results, 'respondent_id': respondent_id})
 
 
 @router.get('/status/', status_code=status.HTTP_200_OK, response_model=list[QuizResultsStatus])
