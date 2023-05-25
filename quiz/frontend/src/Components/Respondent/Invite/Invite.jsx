@@ -1,11 +1,7 @@
 import React, { Component } from "react";
-import "./Quiz.css";
 import CookieLib from "../../../cookielib/index";
 import axios from "axios";
-import LoadingScreen from "react-loading-screen";
-import { Spinner } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function withParams(Component) {
 	return (props) => <Component {...props} params={useParams()} />;
