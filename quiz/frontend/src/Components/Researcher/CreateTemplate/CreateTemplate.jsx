@@ -357,7 +357,7 @@ export default withParams(
 					</div>
 				</div>
 			) : (
-				<Navigate to="/quizes" replace={true} />
+				<Navigate to="/quizzes" replace={true} />
 			);
 		}
 	}

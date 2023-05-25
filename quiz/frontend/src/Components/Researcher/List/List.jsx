@@ -124,7 +124,7 @@ export default class List extends Component {
 						<button
 							type="submit"
 							onClick={() =>
-								(window.location.href = "/researcher/quizes/create")
+								(window.location.href = "/researcher/quizzes/create")
 							}
 							id="btnPlay"
 						>
@@ -186,7 +186,7 @@ export default class List extends Component {
 				</div> */}
 			</div>
 		) : (
-			<Navigate to="/quizes" replace={true} />
+			<Navigate to="/quizzes" replace={true} />
 		);
 	}
 }

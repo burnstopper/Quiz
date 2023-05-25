@@ -3,6 +3,6 @@ import { Navigate } from "react-router-dom";
 
 export default class Templates extends Component {
 	render() {
-		return <Navigate to="/quizes" replace={true} />;
+		return <Navigate to="/quizzes" replace={true} />;
 	}
 }

@@ -36,11 +36,11 @@ root.render(
 		<Header />
 		<div className="main-window">
 			<Routes>
-				<Route path="/quizes" element={<Respondent id={id} />} />
-				<Route path="/quizes/:quiz" element={<Quiz id={id} />} />
-				<Route path="/researcher/quizes" element={<List id={id} />} />
+				<Route path="/quizzes" element={<Respondent id={id} />} />
+				<Route path="/quizzes/:quiz" element={<Quiz id={id} />} />
+				<Route path="/researcher/quizzes" element={<List id={id} />} />
 				<Route
-					path="/researcher/quizes/:quiz"
+					path="/researcher/quizzes/:quiz"
 					element={<CreateQuiz id={id} />}
 				/>
 				<Route

@@ -172,7 +172,7 @@ export default withParams(
 					<div className="calendar"></div>
 				</div>
 			) : (
-				<Navigate to="/quizes" replace={true} />
+				<Navigate to="/quizzes" replace={true} />
 			);
 		}
 	}
